@@ -12,11 +12,13 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print('Logged in as ' + client.user.name)
+    print('Discord ID: ' + client.user.id)
     print('------')
     print(client)
+    print('Created by SamuiNe <https://github.com/SamuiNe>')
+    await client.change_status(game=discord.Game(name='with pointers'), idle=False)
+    print('Discord Bot (Sophia) Version 0.02, Ready.')
 
 
 @client.event
@@ -57,19 +59,24 @@ async def on_message(message):
 
             elif message.content == '<!!debug':
                 if message.author.id != bot and message.author.id == atsui:
-                    await client.send_message(message.channel, message.content)
-                    await client.send_message(message.channel, message.author.id)
-                    await client.send_message(message.channel, message.author)
-                    await client.send_message(message.channel, len(message.content))
+                    await client.send_message(message.channel, '`Message Content`:\n' + str(message.content) + '\n' +
+                            '`Discord ID`: ' + str(message.author.id) + '\n' +
+                            '`Author`: ' + str(message.author) + '\n' +
+                            '`Message Length`: ' + str(len(str(message.content))))
+                    await client.send_message(message.channel, message.channel)
+                    await client.send_message(message.channel, message.channel.id)
+                    await client.send_message(message.channel,message.server.name)
+                    await client.send_message(message.channel,message.server.id)
 
             elif message.content == '<!!suspend':
                 if message.author.id == atsui:
                     await asyncio.sleep(5)
                     await client.send_message(message.channel, 'Suspend complete')
 
-            elif message.content == '<!!playchange':
+            elif message.content.startswith('<!!playchange'):
                 if message.author.id == atsui:
-                    await client.change_status(game=discord.Game(name='with Atsui'), idle=False)
+                    gamemessage = str(message.content)[14:]
+                    await client.change_status(game=discord.Game(name=gamemessage), idle=False)
                     await client.send_message(message.channel, 'Playing message successfully updated')
 
             elif message.content == '<!!rest':
