@@ -7,6 +7,9 @@ logging.basicConfig(level=logging.INFO)
 
 atsui = '153789058059993088'
 bot = '225810441610199040'
+tunnelRecipientChannelIDA = None
+tunnelRecipientChannelIDB = None
+tunnelEnable = False
 client = discord.Client()
 
 
@@ -18,23 +21,39 @@ async def on_ready():
     print(client)
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     await client.change_status(game=discord.Game(name='with pointers'), idle=False)
-    print('Discord Bot (Sophia) Version 0.02, Ready.')
+    print('Discord Bot (Sophia) Version 0.03, Ready.')
 
 
 @client.event
 async def on_message(message):
     print(message)
+    messagelow = message.content.lower()
+    global tunnelEnable
+
+    if tunnelEnable is True and tunnelRecipientChannelIDA is not None and tunnelRecipientChannelIDB is not None:
+        if message.author.id != bot:
+            if tunnelRecipientChannelIDA == message.channel:
+                    await client.send_message(tunnelRecipientChannelIDB, str(message.author) + ' - ' + message.content)
+            elif tunnelRecipientChannelIDB == message.channel:
+                    await client.send_message(tunnelRecipientChannelIDA, str(message.author) + ' - ' + message.content)
 
     if message.content.startswith('<'):
         if message.content.startswith('<?'):
-            if message.content == '<?help' or message.content == '<?commands':
+            if messagelow == '<?about':
+                await client.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
+
+            elif message.content == '<?help' or message.content == '<?commands':
                 await client.send_message(message.channel, "Here are the commands I recognize at the moment:\n\n" +
                 "*Question commands* (starts with `<?`)\n" +
-                "`messages`, `help`\n" +
+                "`about`, `messages`, `help` (`commands`), `invite`\n" +
                 "*Information commands* (starts with `<!`)\n" +
-                "`about` (`commands`), `hello`, `sara` (`sarachan`)")
+                "`hello`, `sara` (`sarachan`), `ping` (`pong`)\n" +
+                "*Trigger commands*\n" +
+                ":coffee:, :tea:, `cawfee`, `gween tea`, " +
+                "`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`\n" +
+                "...with 6 secret commands!")
 
-            elif message.content == '<?messages':
+            elif messagelow == '<?messages':
                 counter = 0
                 tmp = await client.send_message(message.channel, 'Calculating messages...')
                 async for log in client.logs_from(message.channel, limit=100):
@@ -47,28 +66,87 @@ async def on_message(message):
                 messagelength = len(str(message.author))
                 await client.send_message(message.channel, 'Hello ' + str(message.author)[:messagelength-5] + ' o/')
 
-            elif message.content == '<!sarachan' or message.content == '<!sara':
+            elif messagelow == '<!sarachan' or messagelow == '<!sara':
                 await client.send_message(message.channel, 'https://puu.sh/r5mt4/f9eb13dc29.gif')
 
-            elif message.content == '<!about':
-                await client.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
-
-            elif message.content == '<!invite':
-                await client.send_message(message.channel, 'You can invite me via the link below. No permissions required!\n' +
+            elif messagelow == '<!invite':
+                await client.send_message(message.channel, 'You can invite me via the link below. ' +
+                'No permissions required!\n' +
                 'https://discordapp.com/oauth2/authorize?client_id=225810441610199040&scope=bot&permissions=0')
 
-            elif message.content == '<!!debug':
+            elif messagelow == '<!ping':
+                await client.send_message(message.channel, 'pong!')
+
+            elif messagelow == '<!pong':
+                await client.send_message(message.channel, 'ping!')
+
+            elif messagelow == '<!!debug':
                 if message.author.id != bot and message.author.id == atsui:
-                    await client.send_message(message.channel, '`Message Content`:\n' + str(message.content) + '\n' +
-                            '`Discord ID`: ' + str(message.author.id) + '\n' +
+
+                    await client.send_message(message.channel, '`Discord ID`: ' + str(message.author.id) + '\n' +
                             '`Author`: ' + str(message.author) + '\n' +
                             '`Message Length`: ' + str(len(str(message.content))))
                     await client.send_message(message.channel, message.channel)
                     await client.send_message(message.channel, message.channel.id)
-                    await client.send_message(message.channel,message.server.name)
-                    await client.send_message(message.channel,message.server.id)
+                    await client.send_message(message.channel, message.server.name)
+                    await client.send_message(message.channel, message.server.id)
 
-            elif message.content == '<!!suspend':
+            elif messagelow.startswith('<!!tunnellink'):
+                if message.author.id == atsui:
+                    channelid = message.channel.id
+                    if str(messagelow)[-1:] == 'a':
+                        await client.send_message(message.channel, 'Debug info: ' + str(message.channel))
+                        global tunnelRecipientChannelIDA
+                        tunnelRecipientChannelIDA = discord.utils.get(message.server.channels, id=channelid)
+                        await client.send_message(message.channel, tunnelRecipientChannelIDA)
+                        await client.send_message(tunnelRecipientChannelIDA, 'Test successful')
+                        await client.send_message(message.channel, 'Channel ID assignment A successful')
+
+                    elif str(messagelow)[-1:] == 'b':
+                        await client.send_message(message.channel, 'Debug info: ' + str(message.channel))
+                        global tunnelRecipientChannelIDB
+                        tunnelRecipientChannelIDB = discord.utils.get(message.server.channels, id=channelid)
+                        await client.send_message(message.channel, tunnelRecipientChannelIDB)
+                        await client.send_message(tunnelRecipientChannelIDB, 'Test successful')
+                        await client.send_message(message.channel, 'Channel ID assignment B successful')
+
+            elif messagelow.startswith('<!!tunnelenable'):
+                if message.author.id == atsui:
+                    tunnelenableparameter = str(messagelow)[16:]
+                    await client.send_message(message.channel, tunnelenableparameter)
+
+                    if tunnelenableparameter == 'yes' or tunnelenableparameter == '1':
+                        tunnelEnable = True
+                        await client.send_message(message.channel, 'Message tunneling enabled')
+
+                    elif tunnelenableparameter == 'no' or tunnelenableparameter == '0':
+                        tunnelEnable = False
+                        await client.send_message(message.channel, 'Message tunneling disabled')
+
+            elif messagelow == '<!!tunnelinfo':
+                if message.author.id == atsui:
+                    if tunnelRecipientChannelIDA is not None:
+                        tunnelida = tunnelRecipientChannelIDA.id
+                    else:
+                        tunnelida = 'None'
+
+                    if tunnelRecipientChannelIDB is not None:
+                        tunnelidb = tunnelRecipientChannelIDB.id
+                    else:
+                        tunnelidb = 'None'
+
+                    await client.send_message(message.channel, '`Linked channel A`: ' + str(tunnelRecipientChannelIDA) +
+                    ' `' + tunnelida + '`' +
+                    '\n' + '`Linked channel B`: ' + str(tunnelRecipientChannelIDB) +
+                    ' `' + tunnelidb + '`' +
+                    '\n' + '`Tunnel Boolean`: ' + str(tunnelEnable))
+
+            elif messagelow == '<!!tunnelcheck':
+                if message.author.id == atsui:
+                    await client.send_message(message.channel, tunnelRecipientChannelIDA.id)
+                    await client.send_message(message.channel, tunnelRecipientChannelIDB.id)
+
+            elif messagelow == '<!!suspend':
                 if message.author.id == atsui:
                     await asyncio.sleep(5)
                     await client.send_message(message.channel, 'Suspend complete')
@@ -79,19 +157,19 @@ async def on_message(message):
                     await client.change_status(game=discord.Game(name=gamemessage), idle=False)
                     await client.send_message(message.channel, 'Playing message successfully updated')
 
-            elif message.content == '<!!rest':
+            elif messagelow == '<!!rest':
                 if message.author.id == atsui:
                     await client.send_message(message.channel, 'I will rest for now. Good night!')
                     await client.logout()
 
-            elif message.content == '<!!whack':
-                if message.author.id == atsui:
+            elif messagelow == '<!!whack':
+                if  message.author.id == atsui:
                     await client.send_message(message.channel, 'o-ow!')
                     await asyncio.sleep(5)
                     await client.send_message(message.channel, 'zzz')
                     await client.logout()
 
-            elif message.content == '<!!selfdestruct':
+            elif messagelow == '<!!selfdestruct':
                 if message.author.id == atsui:
                     await client.send_message(message.channel, ':boom:')
                     await client.logout()
@@ -99,12 +177,12 @@ async def on_message(message):
     elif message.content == '\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b':
         await client.send_message(message.channel, '┬─┬﻿ ノ( ゜-゜ノ)')
 
-    elif message.content == 'cawfee':
+    elif messagelow == 'cawfee':
         if message.author.id != bot:
             await asyncio.sleep(1)
             await client.send_message(message.channel, 'gween tea')
 
-    elif message.content == 'gween tea':
+    elif messagelow == 'gween tea':
         if message.author.id != bot:
             await asyncio.sleep(1)
             await client.send_message(message.channel, 'cawfee')
