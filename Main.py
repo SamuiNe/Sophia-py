@@ -43,6 +43,8 @@ async def on_message(message):
         botCheck = True
 
     if botCheck is False:
+        #TODO: Allow multiple combinations of servers for chat tunnelling
+
         if tunnelEnable is True and tunnelRecipientChannelIDA is not None and tunnelRecipientChannelIDB is not None:
                 if tunnelRecipientChannelIDA == message.channel:
                         await client.send_message(tunnelRecipientChannelIDB, str(message.author) + ' - ' + message.content)
@@ -66,6 +68,8 @@ async def on_message(message):
                         "...with 9 secret commands!")
 
                 elif messagelow == '<?messages':
+                    #TODO: Optimize and make the message check command unique
+
                     counter = 0
                     tmp = await client.send_message(message.channel, 'Calculating messages...')
                     async for log in client.logs_from(message.channel, limit=100):
@@ -81,7 +85,7 @@ async def on_message(message):
                 elif messagelow == '<!sarachan' or messagelow == '<!sara':
                     await client.send_message(message.channel, 'https://puu.sh/r5mt4/f9eb13dc29.gif')
 
-
+                #TODO: Add discord link to the discord server and continue to polish the bot
                 #elif messagelow == '<!invite':
                     #await client.send_message(message.channel, 'You can invite me via the link below. ' +
                     #'No permissions required!\n' +
