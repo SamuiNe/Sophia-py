@@ -1,4 +1,3 @@
-"""Encoding and discord bot essentials"""
 # coding=utf-8
 import discord
 import asyncio
@@ -25,7 +24,6 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    """These lines of code triggers when the bot has logged in and ready to go."""
     print('Logged in as ' + client.user.name)
     print('Discord ID: ' + client.user.id)
     print('------')
@@ -40,7 +38,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    """These lines of message triggers when the bot receives a message from the text chat."""
     print(message)
     messagelow = message.content.lower()
 
