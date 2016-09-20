@@ -5,7 +5,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# TODO: Add customizable command prefix
+previousPlayingMessage = None
 prefixQualifier = '<'
 prefixDebug = '<!!'
 prefixInformation = '<!'
@@ -31,9 +31,13 @@ async def on_ready():
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     if testingMode:
         await client.change_status(game=discord.Game(name='Testing mode enabled'), idle=False)
+        global previousPlayingMessage
+        previousPlayingMessage = 'with pointers'
     else:
         await client.change_status(game=discord.Game(name='with pointers'), idle=False)
-    print('Discord Bot (Sophia) Version 0.03, Ready.')
+        global previousPlayingMessage
+        previousPlayingMessage = 'with pointers'
+    print('Discord Bot (Sophia) Version 0.04, Ready.')
 
 
 @client.event
@@ -162,6 +166,7 @@ async def on_message(message):
 
                 elif messagelow.startswith(prefixDebug + 'prefixchange'):
                     if message.author.id == ATSUI:
+                        processedprefix = [0, None, None, None, None, None]
                         tempcollection = ['<', None, None, None]
                         exceptioncheck = False
                         findqualifier = ' '
@@ -171,7 +176,6 @@ async def on_message(message):
                         processcount = 2
                         tempcounter = 0
                         exceptioncounter = 0
-                        processedprefix = [0, None, None, None, None, None]
 
                         while findcheckafter != -1 and findcount != 5:
                             findcheckbefore = findcheckafter
@@ -244,6 +248,7 @@ async def on_message(message):
                             prefixQuestion = tempcollection[1]
                             prefixInformation = tempcollection[2]
                             prefixDebug = tempcollection[3]
+
                             await client.send_message(message.channel, 'Prefix change success.')
                             await client.send_message(message.channel, 'Debug information:\n' + str(findcheckbefore) +
                                 ' ' + str(findcheckafter) + ' ' + str(findcount) + ' ' + str(processcount) + ' ' +
@@ -261,7 +266,10 @@ async def on_message(message):
 
                 elif message.content.startswith(prefixDebug + 'playchange'):
                     if message.author.id == ATSUI:
+                        global previousPlayingMessage
                         gamemessage = str(message.content)[14:]
+                        previousPlayingMessage = gamemessage
+
                         await client.change_status(game=discord.Game(name=gamemessage), idle=False)
                         await client.send_message(message.channel, 'Playing message successfully updated')
 
@@ -273,11 +281,15 @@ async def on_message(message):
                         if testingmodeparameter == 'yes' or testingmodeparameter == '1':
                             global testingMode
                             testingMode = True
+
+                            await client.change_status(game=discord.Game(name='alchemy experiments'), idle=False)
                             await client.send_message(message.channel, 'Testing mode enabled')
 
                         elif testingmodeparameter == 'no' or testingmodeparameter == '0':
                             global testingMode
                             testingMode = False
+
+                            await client.change_status(game=discord.Game(name=previousPlayingMessage), idle=False)
                             await client.send_message(message.channel, 'Testing mode disabled')
 
                 elif messagelow == prefixDebug + 'rest':
