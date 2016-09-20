@@ -148,12 +148,7 @@ async def on_message(message):
 
                 elif messagelow == prefixDebug + 'tunnelinfo':
                     if message.author.id == ATSUI:
-                        if tunnelReceiveA is not None:
-                            tunnelida = tunnelReceiveA.id
-                        else:
-                            tunnelida = 'None'
-
-                        if tunnelReceiveB is not None:
+                        if tunnelReceiveA is not None or tunnelReceiveB is not None:
                             tunnelidb = tunnelReceiveB.id
                         else:
                             tunnelidb = 'None'
