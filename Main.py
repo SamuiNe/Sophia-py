@@ -82,7 +82,7 @@ async def on_message(message):
                         '*Question commands* (starts with `' + prefixQuestion + '`)\n' +
                         '`about`, `help` (`commands`)\n' +
                         '*Information commands* (starts with `' + prefixInformation + '`)\n' +
-                        '`hello`, `sara` (`sarachan`), `ping` (`pong`)\n, `roomjoin`, `roomcheck`' +
+                        '`hello`, `sara` (`sarachan`), `ping` (`pong`), `roomjoin`, `roomcheck`\n' +
                         '*Trigger commands*\n' +
                         ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
                         '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`\n' +
