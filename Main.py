@@ -48,19 +48,19 @@ async def on_ready():
 @client.event
 async def on_message(message):
     print(message)
-    messagelow = message.content.lower()
+    message_low = message.content.lower()
 
-    isallowed = True
-    isperson = True
+    is_allowed = True
+    is_person = True
 
     if message.author.id == BOT:
-        isperson = False
+        is_person = False
 
     if testing_mode:
         if message.server.id not in allowed_testing:
-            isperson = False
+            is_person = False
 
-    if isperson:
+    if is_person:
         # TODO: Allow multiple combinations of servers for chat tunnelling
 
         # Checks if the chat tunnelling mode is enabled and if the tunnel_receive_a and tunnel_receive_b is not none
@@ -74,7 +74,7 @@ async def on_message(message):
 
         if message.content.startswith(prefix_qualifier):
             if message.content.startswith(prefix_question):
-                if messagelow == prefix_question + 'about':
+                if message_low == prefix_question + 'about':
                     await client.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message.content == prefix_question + 'help' or message.content == prefix_question + 'commands':
@@ -93,11 +93,11 @@ async def on_message(message):
                     mess_len = len(str(message.author))
                     await client.send_message(message.channel, 'Hello ' + str(message.author)[:mess_len-5] + ' o/')
 
-                elif messagelow == prefix_information + 'sarachan' or messagelow == prefix_information + 'sara':
+                elif message_low == prefix_information + 'sarachan' or message_low == prefix_information + 'sara':
                     await client.send_message(message.channel, 'https://puu.sh/r5mt4/f9eb13dc29.gif')
 
                 # TODO: Add discord link to the discord server and continue to polish the bot
-                elif messagelow == prefix_information + 'invite':
+                elif message_low == prefix_information + 'invite':
                     await client.send_message(message.channel,
                         'You can take me to your discord server by clicking the link below' + '\n' +
                         'Please note that you will need at least "administrator" to add bots!' +
@@ -107,28 +107,28 @@ async def on_message(message):
                         '\n' +
                         'https://discord.gg/SpTWKDd')
 
-                elif messagelow == prefix_information + 'ping':
+                elif message_low == prefix_information + 'ping':
                     await client.send_message(message.channel, 'pong!')
 
-                elif messagelow == prefix_information + 'pong':
+                elif message_low == prefix_information + 'pong':
                     await client.send_message(message.channel, 'ping!')
 
-                elif messagelow.startswith(prefix_information + 'roomcreate'):
+                elif message_low.startswith(prefix_information + 'roomcreate'):
                     global minigame_session
                     global table_limits
                     find_qualifier = ' '
-                    find_room_id = messagelow.find(find_qualifier, 0)
+                    find_room_id = message_low.find(find_qualifier, 0)
 
                     await client.send_message(message.channel, 'Room created.')
 
-                elif messagelow.startswith(prefix_information + 'roomjoin'):
+                elif message_low.startswith(prefix_information + 'roomjoin'):
                     global minigame_session
                     global table_limits
                     global player_joined
                     find_qualifier = ' '
-                    find_room_id = messagelow.find(find_qualifier, 0)
-                    find_room_password = messagelow.find(find_qualifier, find_room_id + 1)
-                    room_id = messagelow[find_room_id + 1: find_room_id + 2]
+                    find_room_id = message_low.find(find_qualifier, 0)
+                    find_room_password = message_low.find(find_qualifier, find_room_id + 1)
+                    room_id = message_low[find_room_id + 1: find_room_id + 2]
                     room_player_count = len(minigame_session[int(room_id)]) - 3
                     game_name = table_limits[0].index(minigame_session[int(room_id)][1])
                     roomcapacity = table_limits[1][game_name]
@@ -165,11 +165,11 @@ async def on_message(message):
                     else:
                         await client.send_message(message.channel, "Invalid room ID or room password.")
 
-                elif messagelow.startswith(prefix_information + 'roomcheck'):
+                elif message_low.startswith(prefix_information + 'roomcheck'):
                     global minigame_session
                     find_qualifier = ' '
-                    find_room_id = messagelow.find(find_qualifier, 0)
-                    room_id = messagelow[find_room_id + 1:]
+                    find_room_id = message_low.find(find_qualifier, 0)
+                    room_id = message_low[find_room_id + 1:]
                     loop_limit = len(minigame_session[int(room_id)])
                     loop_count = 4
                     game_name = table_limits[0].index(minigame_session[int(room_id)][1])
@@ -197,7 +197,7 @@ async def on_message(message):
 
                     await client.send_message(message.channel, roominformation)
 
-                elif messagelow == prefix_debug + 'debug':
+                elif message_low == prefix_debug + 'debug':
                     # if message.author.id == ATSUI:
                     await client.send_message(message.channel, '`Author`: ' + str(message.author) +
                         ' `' + str(message.author.id) + '`\n' +
@@ -205,29 +205,29 @@ async def on_message(message):
                         '`Channel`: ' + str(message.channel) + ' `' + str(message.channel.id) + '`\n' +
                         '`Server`: ' + str(message.server.name) + ' `' + str(message.server.id) + '`')
 
-                elif messagelow.startswith(prefix_debug + 'tunnellink'):
+                elif message_low.startswith(prefix_debug + 'tunnellink'):
                     if message.author.id == ATSUI:
                         global tunnel_receive_a
                         global tunnel_receive_b
                         channelid = message.channel.id
 
-                        if str(messagelow)[-1:] == 'a':
+                        if str(message_low)[-1:] == 'a':
                             # await client.send_message(message.channel, 'Debug info: ' + str(message.channel))
                             tunnel_receive_a = discord.utils.get(message.server.channels, id=channelid)
                             # await client.send_message(message.channel, tunnel_receive_a)
                             # await client.send_message(tunnel_receive_a, 'Test successful')
                             await client.send_message(message.channel, 'Channel A assignment successful')
 
-                        elif str(messagelow)[-1:] == 'b':
+                        elif str(message_low)[-1:] == 'b':
                             # await client.send_message(message.channel, 'Debug info: ' + str(message.channel))
                             tunnel_receive_b = discord.utils.get(message.server.channels, id=channelid)
                             # await client.send_message(message.channel, tunnel_receive_b)
                             # await client.send_message(tunnel_receive_b, 'Test successful')
                             await client.send_message(message.channel, 'Channel B assignment successful')
 
-                elif messagelow.startswith(prefix_debug + 'tunnel_enable'):
+                elif message_low.startswith(prefix_debug + 'tunnel_enable'):
                     if message.author.id == ATSUI:
-                        tunnel_enableparameter = str(messagelow)[16:]
+                        tunnel_enableparameter = str(message_low)[16:]
                         await client.send_message(message.channel, tunnel_enableparameter)
 
                         if tunnel_enableparameter == 'yes' or tunnel_enableparameter == '1':
@@ -240,7 +240,7 @@ async def on_message(message):
                             tunnel_enable = False
                             await client.send_message(message.channel, 'Message tunneling disabled')
 
-                elif messagelow == prefix_debug + 'tunnelinfo':
+                elif message_low == prefix_debug + 'tunnelinfo':
                     if message.author.id == ATSUI:
                         if tunnel_receive_a is not None:
                             tunnelida = tunnel_receive_a.id
@@ -258,87 +258,87 @@ async def on_message(message):
                             ' `' + tunnelidb + '`' +
                             '\n' + '`Tunnel Boolean`: ' + str(tunnel_enable))
 
-                elif messagelow.startswith(prefix_debug + 'prefixchange'):
+                elif message_low.startswith(prefix_debug + 'prefixchange'):
                     if message.author.id == ATSUI:
-                        processindex = [0, None, None, None, None, None]
-                        tempcollection = ['<', None, None, None, None]
-                        exceptioncheck = False
+                        process_index = [0, None, None, None, None, None]
+                        temp_collection = ['<', None, None, None, None]
+                        exception_check = False
                         find_qualifier = ' '
-                        # findcheckbefore = 0
-                        findcheckafter = 0
-                        findcount = 0
-                        processcount = 1
-                        tempcounter = 0
-                        exceptioncounter = 0
+                        # find_check_before = 0
+                        find_check_after = 0
+                        find_count = 0
+                        process_count = 1
+                        temp_counter = 0
+                        exception_counter = 0
 
-                        while findcheckafter != -1 and findcount != 5:
-                            findcheckbefore = findcheckafter
-                            findcheckafter = messagelow.find(find_qualifier, findcheckbefore + 1)
+                        while find_check_after != -1 and find_count != 5:
+                            find_check_before = find_check_after
+                            find_check_after = message_low.find(find_qualifier, find_check_before + 1)
 
-                            if findcheckafter != -1:
-                                findcount += 1
-                                processindex[findcount] = findcheckafter
+                            if find_check_after != -1:
+                                find_count += 1
+                                process_index[find_count] = find_check_after
 
-                        while processindex[processcount] is not None and processcount != 5:
-                            if processcount == 4:
-                                tempcollection[tempcounter] = messagelow[(processindex[processcount] + 1):]
+                        while process_index[process_count] is not None and process_count != 5:
+                            if process_count == 4:
+                                temp_collection[temp_counter] = message_low[(process_index[process_count] + 1):]
                             else:
-                                tempcollection[tempcounter] = messagelow[processindex[processcount] + 1:
-                                processindex[processcount + 1]]
+                                temp_collection[temp_counter] = message_low[process_index[process_count] + 1:
+                                process_index[process_count + 1]]
 
-                            tempcounter += 1
-                            processcount += 1
+                            temp_counter += 1
+                            process_count += 1
                         ''' Old Code
-                        if processindex[2] is not None:
-                            tempqualifier = messagelow[processindex[1] + 1: \
-                                (processindex[2] - processindex[1]) - 2]
+                        if process_index[2] is not None:
+                            tempqualifier = message_low[process_index[1] + 1: \
+                                (process_index[2] - process_index[1]) - 2]
 
-                        if processindex[3] is not None:
-                            tempquestion = messagelow[processindex[2] + 1: \
-                                (processindex[3] - processindex[2]) - 2]
+                        if process_index[3] is not None:
+                            tempquestion = message_low[process_index[2] + 1: \
+                                (process_index[3] - process_index[2]) - 2]
 
-                        if processindex[4] is not None:
-                            tempinformation = messagelow[processindex[3] + 1: \
-                                (processindex[4] - processindex[3]) - 2]
+                        if process_index[4] is not None:
+                            tempinformation = message_low[process_index[3] + 1: \
+                                (process_index[4] - process_index[3]) - 2]
 
-                        if processindex[5] is not None:
-                            tempdebug = messagelow[processindex[4] + 1: \
-                                (processindex[5] - processindex[4]) - 2]
+                        if process_index[5] is not None:
+                            tempdebug = message_low[process_index[4] + 1: \
+                                (process_index[5] - process_index[4]) - 2]
                         '''
 
-                        if tempcollection[exceptioncounter] is not None and \
-                                tempcollection[exceptioncounter + 1] is not None:
+                        if temp_collection[exception_counter] is not None and \
+                                temp_collection[exception_counter + 1] is not None:
 
-                            while tempcollection[exceptioncounter] is not None and exceptioncounter != 4:
+                            while temp_collection[exception_counter] is not None and exception_counter != 4:
 
-                                if tempcollection[0] not in tempcollection[exceptioncounter]:
-                                    exceptioncheck = True
-                                exceptioncounter += 1
+                                if temp_collection[0] not in temp_collection[exception_counter]:
+                                    exception_check = True
+                                exception_counter += 1
                         ''' Old code
                         if tempqualifier is not None and tempquestion is not None:
                             if tempquestion is not None and not tempquestion.startswith(tempqualifier):
-                                exceptioncheck = True
+                                exception_check = True
 
                             if tempinformation is not None and not tempinformation.startswith(tempqualifier):
-                                exceptioncheck = True
+                                exception_check = True
 
                             if tempdebug is not None and not tempinformation.startswith(tempqualifier):
-                                exceptioncheck = True
+                                exception_check = True
                         '''
 
-                        if exceptioncheck:
+                        if exception_check:
                             await client.send_message(message.channel, 'Prefix change failed')
-                            '''await client.send_message(message.channel, 'Debug information:\n' + str(findcheckbefore) +
-                                ' ' + str(findcheckafter) + ' ' + str(findcount) + ' ' + str(processcount) + ' ' +
-                                str(tempcounter) + ' ' + str(exceptioncounter) + '\n' +
-                                str(exceptioncheck) + '\n' +
-                                '> ' + str(processindex[0]) + ' ' + str(processindex[1]) + ' ' +
-                                str(processindex[2]) + ' ' + str(processindex[3]) + ' ' +
-                                str(processindex[4]) + ' ' + str(processindex[5]) + '\n' +
-                                '>> ' + str(tempcollection[0]) + ' ' + str(tempcollection[1]) + ' ' +
-                                str(tempcollection[2]) + ' ' + str(tempcollection[3]) + '\n' +
-                                'L> ' + str(len(str(tempcollection[0]))) + ', ' + str(len(str(tempcollection[1]))) +
-                                ', ' + str(len(str(tempcollection[2]))) + ', ' + str(len(str(tempcollection[3]))))
+                            '''await client.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
+                                ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
+                                str(temp_counter) + ' ' + str(exception_counter) + '\n' +
+                                str(exception_check) + '\n' +
+                                '> ' + str(process_index[0]) + ' ' + str(process_index[1]) + ' ' +
+                                str(process_index[2]) + ' ' + str(process_index[3]) + ' ' +
+                                str(process_index[4]) + ' ' + str(process_index[5]) + '\n' +
+                                '>> ' + str(temp_collection[0]) + ' ' + str(temp_collection[1]) + ' ' +
+                                str(temp_collection[2]) + ' ' + str(temp_collection[3]) + '\n' +
+                                'L> ' + str(len(str(temp_collection[0]))) + ', ' + str(len(str(temp_collection[1]))) +
+                                ', ' + str(len(str(temp_collection[2]))) + ', ' + str(len(str(temp_collection[3]))))
                             '''
 
                         else:
@@ -346,26 +346,26 @@ async def on_message(message):
                             global prefix_question
                             global prefix_information
                             global prefix_debug
-                            prefix_qualifier = tempcollection[0]
-                            prefix_question = tempcollection[1]
-                            prefix_information = tempcollection[2]
-                            prefix_debug = tempcollection[3]
+                            prefix_qualifier = temp_collection[0]
+                            prefix_question = temp_collection[1]
+                            prefix_information = temp_collection[2]
+                            prefix_debug = temp_collection[3]
 
                             await client.send_message(message.channel, 'Prefix change success')
-                            '''await client.send_message(message.channel, 'Debug information:\n' + str(findcheckbefore) +
-                                ' ' + str(findcheckafter) + ' ' + str(findcount) + ' ' + str(processcount) + ' ' +
-                                str(tempcounter) + ' ' + str(exceptioncounter) + '\n' +
-                                str(exceptioncheck) + '\n' +
-                                '> ' + str(processindex[0]) + ' ' + str(processindex[1]) + ' ' +
-                                str(processindex[2]) + ' ' + str(processindex[3]) + ' ' +
-                                str(processindex[4]) + ' ' + str(processindex[5]) + '\n' +
-                                '>> ' + str(tempcollection[0]) + ' ' + str(tempcollection[1]) + ' ' +
-                                str(tempcollection[2]) + ' ' + str(tempcollection[3]) + '\n' +
-                                'L> ' + str(len(str(tempcollection[0]))) + ', ' + str(len(str(tempcollection[1]))) +
-                                ', ' + str(len(str(tempcollection[2]))) + ', ' + str(len(str(tempcollection[3]))))
+                            '''await client.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
+                                ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
+                                str(temp_counter) + ' ' + str(exception_counter) + '\n' +
+                                str(exception_check) + '\n' +
+                                '> ' + str(process_index[0]) + ' ' + str(process_index[1]) + ' ' +
+                                str(process_index[2]) + ' ' + str(process_index[3]) + ' ' +
+                                str(process_index[4]) + ' ' + str(process_index[5]) + '\n' +
+                                '>> ' + str(temp_collection[0]) + ' ' + str(temp_collection[1]) + ' ' +
+                                str(temp_collection[2]) + ' ' + str(temp_collection[3]) + '\n' +
+                                'L> ' + str(len(str(temp_collection[0]))) + ', ' + str(len(str(temp_collection[1]))) +
+                                ', ' + str(len(str(temp_collection[2]))) + ', ' + str(len(str(temp_collection[3]))))
                             '''
 
-                elif messagelow == prefix_debug + 'suspend':
+                elif message_low == prefix_debug + 'suspend':
                     if message.author.id == ATSUI:
                         await asyncio.sleep(5)
                         await client.send_message(message.channel, 'Suspend complete')
@@ -373,15 +373,15 @@ async def on_message(message):
                 elif message.content.startswith(prefix_debug + 'playchange'):
                     if message.author.id == ATSUI:
                         global previous_playing_message
-                        gamemessage = str(message.content)[14:]
-                        previous_playing_message = gamemessage
+                        game_message = str(message.content)[14:]
+                        previous_playing_message = game_message
 
-                        await client.change_status(game=discord.Game(name=gamemessage), idle=False)
+                        await client.change_status(game=discord.Game(name=game_message), idle=False)
                         await client.send_message(message.channel, 'Playing message successfully updated')
 
                 elif message.content.startswith(prefix_debug + 'testingmode'):
                     if message.author.id == ATSUI:
-                        testing_modeparameter = str(messagelow)[15:]
+                        testing_modeparameter = str(message_low)[15:]
                         await client.send_message(message.channel, testing_modeparameter)
 
                         if testing_modeparameter == 'yes' or testing_modeparameter == '1':
@@ -398,24 +398,24 @@ async def on_message(message):
                             await client.change_status(game=discord.Game(name=previous_playing_message), idle=False)
                             await client.send_message(message.channel, 'Testing mode disabled')
 
-                elif messagelow == prefix_debug + 'rest':
+                elif message_low == prefix_debug + 'rest':
                     if message.author.id == ATSUI:
                         await client.send_message(message.channel, 'I will rest for now. Good night!')
                         await client.logout()
 
-                elif messagelow == prefix_debug + 'whack':
+                elif message_low == prefix_debug + 'whack':
                     if message.author.id == ATSUI:
                         await client.send_message(message.channel, 'o-ow!')
                         await asyncio.sleep(5)
                         await client.send_message(message.channel, 'zzz')
                         await client.logout()
 
-                elif messagelow == prefix_debug + 'selfdestruct':
+                elif message_low == prefix_debug + 'selfdestruct':
                     if message.author.id == ATSUI:
                         await client.send_message(message.channel, ':boom:')
                         await client.logout()
 
-                elif messagelow.startswith(prefix_debug + 'changename'):
+                elif message_low.startswith(prefix_debug + 'changename'):
                     if message.author.id == ATSUI:
                         find_qualifier = ' '
                         name_position = message.content.find(find_qualifier, 0)
@@ -429,14 +429,14 @@ async def on_message(message):
 
         else:
             if message.server.id in server_exclude:
-                isallowed = False
+                is_allowed = False
 
-            if isallowed:
-                if messagelow == 'cawfee':
+            if is_allowed:
+                if message_low == 'cawfee':
                         await asyncio.sleep(1)
                         await client.send_message(message.channel, 'gween tea')
 
-                elif messagelow == 'gween tea':
+                elif message_low == 'gween tea':
                         await asyncio.sleep(1)
                         await client.send_message(message.channel, 'cawfee')
 
