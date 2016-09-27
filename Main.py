@@ -2,7 +2,8 @@
 import discord
 import asyncio
 import logging
-
+import room
+import system
 logging.basicConfig(level=logging.INFO)
 
 # TODO: NO GLOBAL VARIABLES
@@ -13,7 +14,7 @@ prefix_information = '>!'
 prefix_question = '>?'
 ATSUI = '153789058059993088'
 allowed_testing = ['154488551596228610', '164476517101993984']
-testing_mode = False
+test_mode = False
 BOT = '225810441610199040'
 server_exclude = ['110373943822540800']
 exclusion_max = len(server_exclude)
@@ -37,8 +38,8 @@ async def on_ready():
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     global previous_playing_message
     previous_playing_message = 'with pointers'
-    if testing_mode:
-        await client.change_status(game=discord.Game(name='Testing mode enabled'), idle=False)
+    if test_mode:
+        await client.change_status(game=discord.Game(name='with alchemy'), idle=False)
     else:
         await client.change_status(game=discord.Game(name='with pointers'), idle=False)
     token.close()
@@ -53,10 +54,10 @@ async def on_message(message):
     is_allowed = True
     is_person = True
 
-    if message.author.id == BOT:
+    if message.author.bot:
         is_person = False
 
-    if testing_mode:
+    if test_mode:
         if message.server.id not in allowed_testing:
             is_person = False
 
@@ -116,91 +117,23 @@ async def on_message(message):
                 elif message_low.startswith(prefix_information + 'roomcreate'):
                     global minigame_session
                     global table_limits
-                    find_qualifier = ' '
-                    find_room_id = message_low.find(find_qualifier, 0)
-
-                    await client.send_message(message.channel, 'Room created.')
+                    await room.room_create(client, message, message_low, minigame_session, table_limits)
 
                 elif message_low.startswith(prefix_information + 'roomjoin'):
                     global minigame_session
                     global table_limits
                     global player_joined
-                    find_qualifier = ' '
-                    find_room_id = message_low.find(find_qualifier, 0)
-                    find_room_password = message_low.find(find_qualifier, find_room_id + 1)
-                    room_id = message_low[find_room_id + 1: find_room_id + 2]
-                    room_player_count = len(minigame_session[int(room_id)]) - 3
-                    game_name = table_limits[0].index(minigame_session[int(room_id)][1])
-                    roomcapacity = table_limits[1][game_name]
-                    is_allowed = True
-                    
-                    if minigame_session[int(room_id)][1] is not None and minigame_session[int(room_id)][2] != '':
-                        # await client.send_message(message.channel, "Password exists")
-                        if find_room_password is not -1:
-                            # await client.send_message(message.channel, "User enters a password")
-                            if message.content[find_room_password + 1:] != minigame_session[int(room_id)][2]:
-                                # await client.send_message(message.channel, \
-                                    # "Password does not match with the room password")
-                                is_allowed = False
-                        else:
-                            # await client.send_message(message.channel, "User dun goofed")
-                            is_allowed = False
-                    '''await client.send_message(message.channel, message.content[find_room_password + 1:] +
-                        str(len(message.content[find_room_password + 1:])) + '\n' +
-                        minigame_session[int(room_id)][2] + str(len(minigame_session[int(room_id)][2])))'''
-
-                    if is_allowed:
-                        if room_player_count <= roomcapacity:
-                            if message.author not in player_joined:
-                                await client.send_message(message.channel, 'yes')
-                                minigame_session[int(room_id)].append(message.author)
-                                player_joined.append(message.author)
-                                await client.send_message(message.channel, 'You are now in room ' + str(room_id) + '.')
-
-                            else:
-                                await client.send_message(message.channel, 'no')
-                                await client.send_message(message.channel, 'Unable to join since you are in a room.')
-                        else:
-                            await client.send_message(message.channel, 'Unable to join since the room is full.')
-                    else:
-                        await client.send_message(message.channel, "Invalid room ID or room password.")
+                    await room.room_join(client, message, message_low, table_limits, minigame_session, player_joined)
 
                 elif message_low.startswith(prefix_information + 'roomcheck'):
                     global minigame_session
-                    find_qualifier = ' '
-                    find_room_id = message_low.find(find_qualifier, 0)
-                    room_id = message_low[find_room_id + 1:]
-                    loop_limit = len(minigame_session[int(room_id)])
-                    loop_count = 4
-                    game_name = table_limits[0].index(minigame_session[int(room_id)][1])
-                    is_password = False
-
-                    if minigame_session[int(room_id)][1] is not None and minigame_session[int(room_id)][1] != '':
-                        is_password = True
-
-                    await client.send_message(message.channel, 'yes')
-
-                    roominformation = '`Room Name`: ' + minigame_session[int(room_id)][0] + \
-                        ' `Password`: ' + str(is_password) + '\n' + \
-                        '`ID`: ' + str(room_id) + '\n' + \
-                        '`Status`: ' + str(room_status[int(minigame_session[int(room_id)][3])]) + '\n' + \
-                        '`Minigame`: ' + str(minigame_session[int(room_id)][1]) + \
-                        ' `Player`: ' + str(loop_limit - 4) + ' / ' + str(table_limits[1][game_name]) + \
-                        '\n' + '`Player List`: \n'
-
-                    while loop_count != loop_limit:
-                        if loop_count != loop_limit - 1:
-                            roominformation += str(minigame_session[int(room_id)][loop_count]) + ', '
-                        else:
-                            roominformation += str(minigame_session[int(room_id)][loop_count])
-                        loop_count += 1
-
-                    await client.send_message(message.channel, roominformation)
+                    await room.room_check(client, message, message_low, table_limits, minigame_session, room_status)
 
                 elif message_low == prefix_debug + 'debug':
                     # if message.author.id == ATSUI:
                     await client.send_message(message.channel, '`Author`: ' + str(message.author) +
                         ' `' + str(message.author.id) + '`\n' +
+                        '`Bot`: ' + str(message.author.bot) + '\n' +
                         '`MessLen`: ' + str(len(str(message.content))) + '\n' +
                         '`Channel`: ' + str(message.channel) + ' `' + str(message.channel.id) + '`\n' +
                         '`Server`: ' + str(message.server.name) + ' `' + str(message.server.id) + '`')
@@ -225,7 +158,7 @@ async def on_message(message):
                             # await client.send_message(tunnel_receive_b, 'Test successful')
                             await client.send_message(message.channel, 'Channel B assignment successful')
 
-                elif message_low.startswith(prefix_debug + 'tunnel_enable'):
+                elif message_low.startswith(prefix_debug + 'tunnelenable'):
                     if message.author.id == ATSUI:
                         tunnel_enableparameter = str(message_low)[16:]
                         await client.send_message(message.channel, tunnel_enableparameter)
@@ -260,110 +193,11 @@ async def on_message(message):
 
                 elif message_low.startswith(prefix_debug + 'prefixchange'):
                     if message.author.id == ATSUI:
-                        process_index = [0, None, None, None, None, None]
-                        temp_collection = ['<', None, None, None, None]
-                        exception_check = False
-                        find_qualifier = ' '
-                        # find_check_before = 0
-                        find_check_after = 0
-                        find_count = 0
-                        process_count = 1
-                        temp_counter = 0
-                        exception_counter = 0
-
-                        while find_check_after != -1 and find_count != 5:
-                            find_check_before = find_check_after
-                            find_check_after = message_low.find(find_qualifier, find_check_before + 1)
-
-                            if find_check_after != -1:
-                                find_count += 1
-                                process_index[find_count] = find_check_after
-
-                        while process_index[process_count] is not None and process_count != 5:
-                            if process_count == 4:
-                                temp_collection[temp_counter] = message_low[(process_index[process_count] + 1):]
-                            else:
-                                temp_collection[temp_counter] = message_low[process_index[process_count] + 1:
-                                process_index[process_count + 1]]
-
-                            temp_counter += 1
-                            process_count += 1
-                        ''' Old Code
-                        if process_index[2] is not None:
-                            tempqualifier = message_low[process_index[1] + 1: \
-                                (process_index[2] - process_index[1]) - 2]
-
-                        if process_index[3] is not None:
-                            tempquestion = message_low[process_index[2] + 1: \
-                                (process_index[3] - process_index[2]) - 2]
-
-                        if process_index[4] is not None:
-                            tempinformation = message_low[process_index[3] + 1: \
-                                (process_index[4] - process_index[3]) - 2]
-
-                        if process_index[5] is not None:
-                            tempdebug = message_low[process_index[4] + 1: \
-                                (process_index[5] - process_index[4]) - 2]
-                        '''
-
-                        if temp_collection[exception_counter] is not None and \
-                                temp_collection[exception_counter + 1] is not None:
-
-                            while temp_collection[exception_counter] is not None and exception_counter != 4:
-
-                                if temp_collection[0] not in temp_collection[exception_counter]:
-                                    exception_check = True
-                                exception_counter += 1
-                        ''' Old code
-                        if tempqualifier is not None and tempquestion is not None:
-                            if tempquestion is not None and not tempquestion.startswith(tempqualifier):
-                                exception_check = True
-
-                            if tempinformation is not None and not tempinformation.startswith(tempqualifier):
-                                exception_check = True
-
-                            if tempdebug is not None and not tempinformation.startswith(tempqualifier):
-                                exception_check = True
-                        '''
-
-                        if exception_check:
-                            await client.send_message(message.channel, 'Prefix change failed')
-                            '''await client.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
-                                ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
-                                str(temp_counter) + ' ' + str(exception_counter) + '\n' +
-                                str(exception_check) + '\n' +
-                                '> ' + str(process_index[0]) + ' ' + str(process_index[1]) + ' ' +
-                                str(process_index[2]) + ' ' + str(process_index[3]) + ' ' +
-                                str(process_index[4]) + ' ' + str(process_index[5]) + '\n' +
-                                '>> ' + str(temp_collection[0]) + ' ' + str(temp_collection[1]) + ' ' +
-                                str(temp_collection[2]) + ' ' + str(temp_collection[3]) + '\n' +
-                                'L> ' + str(len(str(temp_collection[0]))) + ', ' + str(len(str(temp_collection[1]))) +
-                                ', ' + str(len(str(temp_collection[2]))) + ', ' + str(len(str(temp_collection[3]))))
-                            '''
-
-                        else:
-                            global prefix_qualifier
-                            global prefix_question
-                            global prefix_information
-                            global prefix_debug
-                            prefix_qualifier = temp_collection[0]
-                            prefix_question = temp_collection[1]
-                            prefix_information = temp_collection[2]
-                            prefix_debug = temp_collection[3]
-
-                            await client.send_message(message.channel, 'Prefix change success')
-                            '''await client.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
-                                ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
-                                str(temp_counter) + ' ' + str(exception_counter) + '\n' +
-                                str(exception_check) + '\n' +
-                                '> ' + str(process_index[0]) + ' ' + str(process_index[1]) + ' ' +
-                                str(process_index[2]) + ' ' + str(process_index[3]) + ' ' +
-                                str(process_index[4]) + ' ' + str(process_index[5]) + '\n' +
-                                '>> ' + str(temp_collection[0]) + ' ' + str(temp_collection[1]) + ' ' +
-                                str(temp_collection[2]) + ' ' + str(temp_collection[3]) + '\n' +
-                                'L> ' + str(len(str(temp_collection[0]))) + ', ' + str(len(str(temp_collection[1]))) +
-                                ', ' + str(len(str(temp_collection[2]))) + ', ' + str(len(str(temp_collection[3]))))
-                            '''
+                        global prefix_qualifier
+                        global prefix_question
+                        global prefix_information
+                        global prefix_debug
+                        await system.prefix_change.prefix_change(client, message, message_low)
 
                 elif message_low == prefix_debug + 'suspend':
                     if message.author.id == ATSUI:
@@ -379,21 +213,21 @@ async def on_message(message):
                         await client.change_status(game=discord.Game(name=game_message), idle=False)
                         await client.send_message(message.channel, 'Playing message successfully updated')
 
-                elif message.content.startswith(prefix_debug + 'testingmode'):
+                elif message.content.startswith(prefix_debug + 'testmode'):
                     if message.author.id == ATSUI:
-                        testing_modeparameter = str(message_low)[15:]
-                        await client.send_message(message.channel, testing_modeparameter)
+                        testing_mode_parameter = str(message_low)[15:]
+                        await client.send_message(message.channel, testing_mode_parameter)
 
-                        if testing_modeparameter == 'yes' or testing_modeparameter == '1':
-                            global testing_mode
-                            testing_mode = True
+                        if testing_mode_parameter == 'yes' or testing_mode_parameter == '1':
+                            global test_mode
+                            test_mode = True
 
-                            await client.change_status(game=discord.Game(name='alchemy experiments'), idle=False)
+                            await client.change_status(game=discord.Game(name='with alchemy'), idle=False)
                             await client.send_message(message.channel, 'Testing mode enabled')
 
-                        elif testing_modeparameter == 'no' or testing_modeparameter == '0':
-                            global testing_mode
-                            testing_mode = False
+                        elif testing_mode_parameter == 'no' or testing_mode_parameter == '0':
+                            global test_mode
+                            test_mode = False
 
                             await client.change_status(game=discord.Game(name=previous_playing_message), idle=False)
                             await client.send_message(message.channel, 'Testing mode disabled')
