@@ -1,9 +1,11 @@
 # coding=utf-8
-import discord
 import asyncio
 import logging
+import discord
+
+import bot_system
 import room
-import system
+
 logging.basicConfig(level=logging.INFO)
 
 # TODO: NO GLOBAL VARIABLES
@@ -118,7 +120,7 @@ async def on_message(message):
                     global minigame_session
                     global table_limits
                     await room.room_create(client, message, message_low, prefix_information,
-                        minigame_session, table_limits)
+                                           minigame_session, table_limits)
 
                 elif message_low.startswith(prefix_information + 'roomjoin'):
                     global minigame_session
@@ -198,7 +200,7 @@ async def on_message(message):
                         global prefix_question
                         global prefix_information
                         global prefix_debug
-                        await system.prefix_change.prefix_change(client, message, message_low)
+                        await bot_system.prefix_change(client, message, message_low)
 
                 elif message_low == prefix_debug + 'suspend':
                     if message.author.id == ATSUI:
