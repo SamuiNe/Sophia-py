@@ -1,10 +1,49 @@
 # coding=utf-8
 
-async def room_create(client, message, message_low, minigame_session, table_limits):
-    find_qualifier = ' '
-    find_room_id = message_low.find(find_qualifier, 0)
+import string
 
-    await client.send_message(message.channel, 'Room created.')
+# minigame_session = [['Testing room', 'Blackjack', 'Testing', '0']]
+# table_limits = [['Blackjack'], [6]]
+async def room_create(client, message, message_low, prefix_information, minigame_session, table_limits):
+    find_qualifier = ' '
+    find_room_game = [0, None, None, None, None]
+    message_element = ['placeholder', None, None, '0']
+    seperator_counter = 1
+    element_counter = 0
+    room_count = len(minigame_session)
+
+    while seperator_counter != 5:
+        find_room_game[seperator_counter] = message_low.find(find_qualifier, find_room_game[seperator_counter - 1] + 1)
+        seperator_counter += 1
+
+    while element_counter != 3:
+        if element_counter == 2:
+            if find_room_game[element_counter] != -1 and find_room_game[element_counter + 1] != -1:
+                message_element[element_counter] = message.content[find_room_game[element_counter + 1] + 1:]
+        elif element_counter == 1 and find_room_game[element_counter + 2] == -1:
+                message_element[element_counter] = message.content[find_room_game[element_counter + 1] + 1:]
+        else:
+            message_element[element_counter] = message.content[find_room_game[element_counter + 1] + 1:
+                find_room_game[element_counter + 2]]
+        element_counter += 1
+
+    message_element[1] = string.capwords(str(message_element[1]))
+
+    await client.send_message(message.channel, str(find_room_game) + '\n' +
+        str(message_element) + '\n' +
+        str(table_limits[0]) + '\n' +
+        str(room_count))
+
+    if message_element[1] in table_limits[0]:
+        minigame_session.append(message_element)
+        await client.send_message(message.channel, str(minigame_session[room_count]))
+        await client.send_message(message.channel, 'Room created')
+
+    else:
+        await client.send_message(message.channel, 'Game type is not found.' + '\n' +
+            'Please format your message as ' + str(prefix_information) + 'roomcreate' +
+            ' `Room name` `Game name` `Room Password`')
+
 
 async def room_check(client, message, message_low, table_limits, minigame_session, room_status):
     find_qualifier = ' '
@@ -15,7 +54,7 @@ async def room_check(client, message, message_low, table_limits, minigame_sessio
     game_name = table_limits[0].index(minigame_session[int(room_id)][1])
     is_password = False
 
-    if minigame_session[int(room_id)][1] is not None and minigame_session[int(room_id)][1] != '':
+    if minigame_session[int(room_id)][2] is not None:
         is_password = True
 
     await client.send_message(message.channel, 'yes')
@@ -47,7 +86,7 @@ async def room_join(client, message, message_low, table_limits, minigame_session
     roomcapacity = table_limits[1][game_name]
     is_allowed = True
 
-    if minigame_session[int(room_id)][1] is not None and minigame_session[int(room_id)][2] != '':
+    if minigame_session[int(room_id)][1] is not None and minigame_session[int(room_id)][2] is not None:
         # await client.send_message(message.channel, "Password exists")
         if find_room_password is not -1:
             # await client.send_message(message.channel, "User enters a password")
