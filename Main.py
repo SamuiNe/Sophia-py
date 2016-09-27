@@ -43,7 +43,7 @@ async def on_ready():
     else:
         await client.change_status(game=discord.Game(name='with pointers'), idle=False)
     token.close()
-    print('Discord Bot (Sophia) Version 0.0.6, Ready.')
+    print('Discord Bot (Sophia) Version 0.0.7, Ready.')
 
 
 @client.event
@@ -117,7 +117,8 @@ async def on_message(message):
                 elif message_low.startswith(prefix_information + 'roomcreate'):
                     global minigame_session
                     global table_limits
-                    await room.room_create(client, message, message_low, minigame_session, table_limits)
+                    await room.room_create(client, message, message_low, prefix_information,
+                        minigame_session, table_limits)
 
                 elif message_low.startswith(prefix_information + 'roomjoin'):
                     global minigame_session
