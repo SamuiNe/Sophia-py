@@ -80,17 +80,26 @@ async def on_message(message):
                 if message_low == prefix_question + 'about':
                     await client.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
+                if message_low == prefix_question + 'botversion':
+                    await client.send_message(message.channel, 'My current version is 0.0.7, which is last updated ' +
+                        'at 2016/09/28.')
+
                 elif message.content == prefix_question + 'help' or message.content == prefix_question + 'commands':
+                    trigger_status = 'Enabled'
+                    if message.server.id in server_exclude:
+                        trigger_status = 'Disabled'
+
                     await client.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
                         '*Question commands* (starts with `' + prefix_question + '`)\n' +
-                        '`about`, `help` (`commands`)\n' +
+                        '`about`, `help` (`commands`), `botversion`\n' +
                         '*Information commands* (starts with `' + prefix_information + '`)\n' +
-                        '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`), `roomjoin`, `roomcheck`\n' +
-                        '*Trigger commands*\n' +
+                        '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
+                        ' `roomcreate`, `roomjoin`, `roomcheck`\n' +
+                        '*Trigger commands* ' + trigger_status + '\n' +
                         ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
-                        '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`\n' +
+                        '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
+                        '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
                         '...with 11 secret commands!')
-
             elif message.content.startswith(prefix_information):
                 if message.content == prefix_information + 'hello':
                     mess_len = len(str(message.author))
@@ -261,15 +270,18 @@ async def on_message(message):
                         await client.edit_profile(password='', username=username)
                         await client.send_message(message.channel, 'Bot name successfully changed')
 
-        elif message.content == '\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b':
-            await client.send_message(message.channel, '┬─┬﻿ ノ( ゜-゜ノ)')
-
         else:
             if message.server.id in server_exclude:
                 is_allowed = False
 
             if is_allowed:
-                if message_low == 'cawfee':
+                if message.content == '\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029':
+                    await client.send_message(message.channel, '(╯°□°）╯︵ ┻━┻')
+
+                elif message.content == '\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b':
+                    await client.send_message(message.channel, '┬─┬﻿ ノ( ゜-゜ノ)')
+
+                elif message_low == 'cawfee':
                         await asyncio.sleep(1)
                         await client.send_message(message.channel, 'gween tea')
 

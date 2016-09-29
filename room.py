@@ -1,6 +1,9 @@
 # coding=utf-8
-
 import string
+
+# TODO: Create room settings command
+# TODO: Add ability to remove room
+# TODO: Add ability to leave from room
 
 # minigame_session = [['Testing room', 'Blackjack', 'Testing', '0']]
 # table_limits = [['Blackjack'], [6]]
@@ -116,3 +119,5 @@ async def room_join(client, message, message_low, table_limits, minigame_session
             await client.send_message(message.channel, 'Unable to join since the room is full.')
     else:
         await client.send_message(message.channel, "Invalid room ID or room password.")
+
+# async def room_leave(client, message, message_low, minigame_session, player_joined):
