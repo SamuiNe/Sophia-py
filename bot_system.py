@@ -1,6 +1,22 @@
 # coding=utf-8
 
-async def prefix_change(client, message, message_low):
+
+class SystemVariables:
+    """Initializes the required system variables for the bot"""
+
+    def __init__(self, prefix_qualifier, prefix_question, prefix_information, prefix_debug, test_mode,
+            allowed_testing, atsui, server_exclude, previous_playing_message):
+        self.prefix_qualifier = prefix_qualifier
+        self.prefix_question = prefix_question
+        self.prefix_information = prefix_information
+        self.prefix_debug = prefix_debug
+        self.test_mode = test_mode
+        self.allowed_testing = allowed_testing
+        self.ATSUI = atsui
+        self.server_exclude = server_exclude
+        self.previous_playing_message = previous_playing_message
+
+async def prefix_change(system, client, message, message_low):
     process_index = [0, None, None, None, None, None]
     temp_collection = ['<', None, None, None, None]
     exception_check = False
@@ -83,10 +99,10 @@ async def prefix_change(client, message, message_low):
         '''
 
     else:
-        prefix_qualifier = temp_collection[0]
-        prefix_question = temp_collection[1]
-        prefix_information = temp_collection[2]
-        prefix_debug = temp_collection[3]
+        system.prefix_qualifier = temp_collection[0]
+        system.prefix_question = temp_collection[1]
+        system.prefix_information = temp_collection[2]
+        system.prefix_debug = temp_collection[3]
 
         await client.send_message(message.channel, 'Prefix change success')
         '''await client.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
