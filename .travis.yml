@@ -8,4 +8,6 @@ install:
   - sudo apt-get install libffi-dev
   - python3 -m pip install -U discord.py[voice]
 # command to run tests
-script: nosetests
+script:
+  - python3 main.py
+  - nosetests
