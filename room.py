@@ -7,6 +7,25 @@ import string
 
 
 class RoomInformations:
+    """RoomInformations([String], [[String], [Int]], (String), [[String]])
+    Class for constructing player and server data for minigame rooms related commands.
+
+    RoomInformations.player_joined
+        [String]
+        Lists of player joined at a room.
+
+    RoomInformations.table_limits
+        [[String], [Int]]
+        Lists current available game and its player limit.
+
+    RoomInformations.room_status
+        (String)
+        Lists of room statuses.
+
+    RoomInformations.minigame_session
+        [[String]]
+        Index 0 through 4 are reserved for room information, and stores player data from index 5 and on."""
+
     def __init__(self, player_joined, table_limits, room_status, minigame_session):
         self.player_joined = player_joined
         self.table_limits = table_limits
@@ -16,6 +35,14 @@ class RoomInformations:
 # minigame_session = [['Testing room', 'Blackjack', 'Testing', '0']]
 # table_limits = [['Blackjack'], [6]]
 async def room_create(system, room_info, client, message, message_low):
+    """Creates a room for players to join and play minigame.
+
+    Syntax: (System.prefix_information + roomcreate) <Room Name> <Game Name> <Password (Optional)>
+
+    This command alters the following variables:
+        RoomInformations.minigame_session
+        RoomInformations.table_limits"""
+
     find_qualifier = ' '
     find_room_game = [0, None, None, None, None]
     message_element = ['placeholder', None, None, '0']
@@ -58,6 +85,9 @@ async def room_create(system, room_info, client, message, message_low):
 
 
 async def room_check(room_info, client, message, message_low):
+    """Checks the current room information.
+
+    Syntax: (System.prefix_information + roomcheck) <Room ID>"""
     find_qualifier = ' '
     find_room_id = message_low.find(find_qualifier, 0)
     room_id = message_low[find_room_id + 1:]
@@ -89,6 +119,13 @@ async def room_check(room_info, client, message, message_low):
     await client.send_message(message.channel, room_information)
 
 async def room_join(room_info, client, message, message_low):
+    """Allows the player to join a room, provided that the player has not yet joined a room.
+
+    Syntax: (System.prefix_information + roomjoin) <Room ID> <Password(Maybe optional)>
+
+    This command alters the following variables:
+        RoomInformations.minigame_session Index 5+
+        RoomInformations.player_joined"""
     find_qualifier = ' '
     find_room_id = message_low.find(find_qualifier, 0)
     find_room_password = message_low.find(find_qualifier, find_room_id + 1)

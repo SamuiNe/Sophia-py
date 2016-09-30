@@ -1,4 +1,6 @@
 # coding=utf-8
+"""Text encoding UTF-8"""
+
 import asyncio
 import logging
 import discord
@@ -8,8 +10,8 @@ import room
 import chat_tunnel
 
 System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['154488551596228610', '164476517101993984'],
-        '153789058059993088', ['110373943822540800'], None)
-RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ['Waiting', 'In Progress'],
+        ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
+RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], None, None, False)
 
@@ -19,6 +21,7 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
+    """Triggers when the bot is starting up."""
     print('Logged in as ' + client.user.name)
     print('Discord ID: ' + client.user.id)
     print('------')
@@ -26,15 +29,16 @@ async def on_ready():
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     System.previous_playing_mesage = 'with pointers'
     if System.test_mode:
-        await client.change_status(game=discord.Game(name='with alchemy'), idle=False)
+        await client.change_presence(game=discord.Game(name='with alchemy'), idle=False)
     else:
-        await client.change_status(game=discord.Game(name='with pointers'), idle=False)
+        await client.change_presence(game=discord.Game(name='with pointers'), idle=False)
     token.close()
     print('Discord Bot (Sophia) Version 0.0.8, Ready.')
 
 
 @client.event
 async def on_message(message):
+    """Triggers when the bot receives a message."""
     print(message)
     message_low = message.content.lower()
 
@@ -78,15 +82,15 @@ async def on_message(message):
 
                     await client.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
                         '*Question commands* (starts with `' + System.prefix_question + '`)\n' +
-                        '`about`, `help` (`commands`), `botversion`\n' +
+                        '`about`, `help` (`commands`), `botversion`\n\n' +
                         '*Information commands* (starts with `' + System.prefix_information + '`)\n' +
                         '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
-                        ' `roomcreate`, `roomjoin`, `roomcheck`\n' +
+                        ' `roomcreate`, `roomjoin`, `roomcheck`\n\n' +
                         '*Trigger commands* ' + trigger_status + '\n' +
                         ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
                         '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
                         '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
-                        '...with 11 secret commands!')
+                        '...with 12 secret commands!')
             elif message.content.startswith(System.prefix_information):
                 if message.content == System.prefix_information + 'hello':
                     mess_len = len(str(message.author))
@@ -126,12 +130,15 @@ async def on_message(message):
                     await client.send_message(message.channel, '`Author`: ' + str(message.author) +
                         ' `' + str(message.author.id) + '`\n' +
                         '`Bot`: ' + str(message.author.bot) + '\n' +
-                        '`MessLen`: ' + str(len(message.content)) + '\n' +
+                        # '`MessLen`: ' + str(len(message.content)) + '\n' +
                         '`Channel`: ' + str(message.channel) + ' `' + str(message.channel.id) + '`\n' +
                         '`Server`: ' + str(message.server.name) + ' `' + str(message.server.id) + '`')
 
-                elif message.author.id == System.ATSUI:
-                    if message_low.startswith(System.prefix_debug + 'tunnellink'):
+                elif message.author.id in System.ATSUI:
+                    if message_low == System.prefix_debug + 'secret':
+                        await client.send_message(message.channel, 'Nothing to see here!')
+
+                    elif message_low.startswith(System.prefix_debug + 'tunnellink'):
                             channelid = message.channel.id
 
                             if str(message_low)[-1:] == 'a':
@@ -226,9 +233,9 @@ async def on_message(message):
                     elif message_low.startswith(System.prefix_debug + 'changename'):
                             find_qualifier = ' '
                             name_position = message.content.find(find_qualifier, 0)
-                            username = message.content[name_position+1:]
-                            # client.send_message(message.channel, str(len(username)) + username)
-                            await client.edit_profile(password='', username=username)
+                            namechange = message.content[name_position + 1:]
+                            # await client.send_message(message.channel, str(len(username)) + username)
+                            await client.edit_profile(password='', username=namechange)
                             await client.send_message(message.channel, 'Bot name successfully changed')
 
         else:

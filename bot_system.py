@@ -1,8 +1,46 @@
 # coding=utf-8
+"""Text encoding UTF-8"""
 
 
 class SystemVariables:
-    """Initializes the required system variables for the bot"""
+    """SystemVariables(String, String, String, String, Boolean, [String], (String), [String], String)
+    Class for constructing required system variables for the bot.
+
+    SystemVariables.prefix_qualifier
+        String
+        Command qualifier. Intended to be the first character of all command prefix.
+
+    SystemVariables.prefix_question
+        String
+        Command prefix for question related commands.
+
+    SystemVariables.prefix_information
+        String
+        Command prefix for information related commands.
+
+    SystemVariables.prefix_debug
+        String
+        Command prefix for debug related commands.
+
+    SystemVariables.test_mode
+        Boolean
+        Determines if the bot will start in test mode or not.
+
+    SystemVariables.allowed_testing
+        [String]
+        Entries of server ID allowed when test mode is enabled.
+
+    SystemVariables.ATSUI
+        (String)
+        Entries of client ID allowed for debug prefix commands.
+
+    SystemVariables.server_exclude
+        [String]
+        Entries of server ID excluded from having trigger commands.
+
+    SystemVariables.previous_playing_message
+        String
+        Entry of previous playing message. For playing message storage when testing mode is turned on and off."""
 
     def __init__(self, prefix_qualifier, prefix_question, prefix_information, prefix_debug, test_mode,
             allowed_testing, atsui, server_exclude, previous_playing_message):
@@ -17,11 +55,17 @@ class SystemVariables:
         self.previous_playing_message = previous_playing_message
 
 async def prefix_change(system, client, message, message_low):
+    """Changes the bot's prefix.
+
+    This command alters the following variables:
+        SystemVariables.prefix_qualifier
+        SystemVariables.prefix_question
+        SystemVariables.prefix_information
+        SystemVariables.prefix_debug"""
     process_index = [0, None, None, None, None, None]
     temp_collection = ['<', None, None, None, None]
     exception_check = False
     find_qualifier = ' '
-    # find_check_before = 0
     find_check_after = 0
     find_count = 0
     process_count = 1
