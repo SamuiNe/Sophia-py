@@ -9,9 +9,9 @@ import bot_system
 import room
 import chat_tunnel
 
-System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['154488551596228610', '164476517101993984'],
-        ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
-RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
+System = bot_system.SystemVariables('<', '<?', '<!', '<!!', False, ['154488551596228610', '164476517101993984'],
+        '153789058059993088', ['110373943822540800'], None)
+RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ['Waiting', 'In Progress'],
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], None, None, False)
 
