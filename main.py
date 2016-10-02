@@ -14,7 +14,7 @@ System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['15448855159
         ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
-TunnelInfo = chat_tunnel.TunnelInformations([], [[False]])
+TunnelInfo = chat_tunnel.TunnelInformations([], [[False, 'Testing', '']])
 sophia = discord.Client()
 
 
@@ -113,7 +113,7 @@ async def on_message(message):
                         message_index = message.content.find(message_qualifier, 0)
                         message_split = message.content[message_index + 1:]
 
-                        if message_split != '':
+                        if message_split != '' and message_index != -1:
                             message_send = eval(message_split)
 
                             await sophia.send_message(message.channel, message_send)
@@ -124,12 +124,12 @@ async def on_message(message):
                         await sophia.send_message(message.channel, 'Nothing to see here!')
 
                     elif message_low.startswith(System.prefix_debug + 'tunnellink'):
-                        await chat_tunnel.tunnel_link(discord, sophia, message, message_low, TunnelInfo)
+                        await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
                         await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
 
-                    elif message_low == System.prefix_debug + 'tunnelinfo':
+                    elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
                         await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_debug + 'prefixchange'):

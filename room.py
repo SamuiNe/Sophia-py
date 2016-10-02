@@ -96,7 +96,7 @@ async def room_check(room_info, sophia, message, message_low):
     game_name = room_info.table_limits[0].index(room_info.minigame_session[int(room_id)][1])
     is_password = False
 
-    if room_info.minigame_session[int(room_id)][2] is not None:
+    if room_info.minigame_session[int(room_id)][2] is not ' ':
         is_password = True
 
     await sophia.send_message(message.channel, 'yes')
