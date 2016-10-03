@@ -15,6 +15,7 @@ System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['15448855159
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [[False, 'Testing', '']])
+DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
 
 
@@ -70,8 +71,8 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.0.8, which is last updated ' +
-                        'at 2016/09/30.')
+                    await sophia.send_message(message.channel, 'My current version is 0.0.9, which is last updated ' +
+                        'at 2016/10/02.')
 
                 elif message.content == System.prefix_question + 'help' or \
                         message.content == System.prefix_question + 'commands':
@@ -114,9 +115,13 @@ async def on_message(message):
                         message_split = message.content[message_index + 1:]
 
                         if message_split != '' and message_index != -1:
-                            message_send = eval(message_split)
+                            if message_split not in DangerousEval:
+                                message_send = eval(message_split)
 
-                            await sophia.send_message(message.channel, message_send)
+                                await sophia.send_message(message.channel, message_send)
+                            else:
+                                await sophia.send_message(message.channel, 'What are you doing?! ' +
+                                    'I refuse to eval that one!')
                         else:
                             await sophia.send_message(message.channel, 'There is nothing to eval!')
 
