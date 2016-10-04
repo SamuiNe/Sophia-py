@@ -1,8 +1,46 @@
 # coding=utf-8
+"""Text encoding UTF-8"""
 
 
 class SystemVariables:
-    """Initializes the required system variables for the bot"""
+    """SystemVariables(String, String, String, String, Boolean, [String], (String), [String], String)
+    Class for constructing required system variables for the bot.
+
+    SystemVariables.prefix_qualifier
+        String
+        Command qualifier. Intended to be the first character of all command prefix.
+
+    SystemVariables.prefix_question
+        String
+        Command prefix for question related commands.
+
+    SystemVariables.prefix_information
+        String
+        Command prefix for information related commands.
+
+    SystemVariables.prefix_debug
+        String
+        Command prefix for debug related commands.
+
+    SystemVariables.test_mode
+        Boolean
+        Determines if the bot will start in test mode or not.
+
+    SystemVariables.allowed_testing
+        [String]
+        Entries of server ID allowed when test mode is enabled.
+
+    SystemVariables.ATSUI
+        (String)
+        Entries of client ID allowed for debug prefix commands.
+
+    SystemVariables.server_exclude
+        [String]
+        Entries of server ID excluded from having trigger commands.
+
+    SystemVariables.previous_playing_message
+        String
+        Entry of previous playing message. For playing message storage when testing mode is turned on and off."""
 
     def __init__(self, prefix_qualifier, prefix_question, prefix_information, prefix_debug, test_mode,
             allowed_testing, atsui, server_exclude, previous_playing_message):
@@ -16,12 +54,69 @@ class SystemVariables:
         self.server_exclude = server_exclude
         self.previous_playing_message = previous_playing_message
 
-async def prefix_change(system, client, message, message_low):
+async def command_help(system, sophia, message):
+    trigger_status = 'Enabled'
+    if message.server.id in system.server_exclude:
+        trigger_status = 'Disabled'
+
+    await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
+        '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
+        '`about`, `help` (`commands`), `botversion`, `infocheck`\n\n' +
+        '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
+        '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
+        ' `roomcreate`, `roomjoin`, `roomcheck`\n\n' +
+        '*Trigger commands* ' + trigger_status + '\n' +
+        ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
+        '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
+        '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
+        '...with 11 secret commands!')
+
+async def info_check(sophia, message):
+    await sophia.send_message(message.channel, '`Author`: ' + str(message.author) +
+        ' `' + str(message.author.id) + '`\n' +
+        '`Bot`: ' + str(message.author.bot) + '\n' +
+        # '`MessLen`: ' + str(len(message.content)) + '\n' +
+        '`Channel`: ' + str(message.channel) + ' `' + str(message.channel.id) + '`\n' +
+        '`Server`: ' + str(message.server.name) + ' `' + str(message.server.id) + '`')
+
+async def server_invite(sophia, message):
+    await sophia.send_message(message.channel,
+        'You can take me to your discord server by clicking the link below' + '\n' +
+        'Please note that you will need at least "administrator" to add bots!' +
+        'https://discordapp.com/oauth2/authorize?client_id=225810441610199040&scope=bot&permissions=0' +
+        '\n\n' +
+        'Interested in joining my discord guild? You can visit it by using the invite link below!' +
+        '\n' +
+        'https://discord.gg/SpTWKDd')
+
+async def test_mode(system, discord, sophia, message, message_low):
+    testing_mode_parameter = str(message_low)[15:]
+    await sophia.send_message(message.channel, testing_mode_parameter)
+
+    if testing_mode_parameter == 'yes' or testing_mode_parameter == '1':
+        system.test_mode = True
+
+        await sophia.change_presence(game=discord.Game(name='with alchemy'))
+        await sophia.change_presence(message.channel, 'Testing mode enabled')
+
+    elif testing_mode_parameter == 'no' or testing_mode_parameter == '0':
+        system.test_mode = False
+
+        await sophia.change_status(game=discord.Game(name=system.previous_playing_message))
+        await sophia.send_message(message.channel, 'Testing mode disabled')
+
+async def prefix_change(system, sophia, message, message_low):
+    """Changes the bot's prefix.
+
+    This command alters the following variables:
+        SystemVariables.prefix_qualifier
+        SystemVariables.prefix_question
+        SystemVariables.prefix_information
+        SystemVariables.prefix_debug"""
     process_index = [0, None, None, None, None, None]
     temp_collection = ['<', None, None, None, None]
     exception_check = False
     find_qualifier = ' '
-    # find_check_before = 0
     find_check_after = 0
     find_count = 0
     process_count = 1
@@ -84,8 +179,8 @@ async def prefix_change(system, client, message, message_low):
     '''
 
     if exception_check:
-        await client.send_message(message.channel, 'Prefix change failed')
-        '''await client.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
+        await sophia.send_message(message.channel, 'Prefix change failed')
+        '''await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
             ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
             str(temp_counter) + ' ' + str(exception_counter) + '\n' +
             str(exception_check) + '\n' +
@@ -104,8 +199,8 @@ async def prefix_change(system, client, message, message_low):
         system.prefix_information = temp_collection[2]
         system.prefix_debug = temp_collection[3]
 
-        await client.send_message(message.channel, 'Prefix change success')
-        '''await client.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
+        await sophia.send_message(message.channel, 'Prefix change success')
+        '''await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
             ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
             str(temp_counter) + ' ' + str(exception_counter) + '\n' +
             str(exception_check) + '\n' +
@@ -117,3 +212,11 @@ async def prefix_change(system, client, message, message_low):
             'L> ' + str(len(str(temp_collection[0]))) + ', ' + str(len(str(temp_collection[1]))) +
             ', ' + str(len(str(temp_collection[2]))) + ', ' + str(len(str(temp_collection[3]))))
         '''
+
+async def change_name(sophia, message):
+    find_qualifier = ' '
+    name_position = message.content.find(find_qualifier, 0)
+    namechange = message.content[name_position + 1:]
+    # await sophia.send_message(message.channel, str(len(username)) + username)
+    await sophia.edit_profile(password='', username=namechange)
+    await sophia.send_message(message.channel, 'Bot name successfully changed')
