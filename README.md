@@ -7,5 +7,5 @@ A work-in-progress chat bot for Discord
 Nothing much to say at the moment （´・ω・｀）
 
 ## Requirements
-- discord.py library Version 0.12.0 or newer... and its requirements
+- discord.py library Version 0.11.0 or newer and its requirements
 - Python 3.5.2
