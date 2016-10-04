@@ -131,8 +131,8 @@ async def on_message(message):
                     elif message_low.startswith(System.prefix_debug + 'tunnellink'):
                         await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
 
-                    elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
-                        await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
+                    # elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
+                    #   await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
                         await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
