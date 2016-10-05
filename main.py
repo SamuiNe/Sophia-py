@@ -33,7 +33,7 @@ async def on_ready():
     else:
         await sophia.change_presence(game=discord.Game(name='with pointers'))
     token.close()
-    print('Discord Bot (Sophia) Version 0.0.10, Ready.')
+    print('Discord Bot (Sophia) Version 0.0.11, Ready.')
 
 
 def channel_find(message, tunnel_info):
@@ -75,8 +75,8 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.0.9, which is last updated ' +
-                        'at 2016/10/02.')
+                    await sophia.send_message(message.channel, 'My current version is 0.0.11, which is last updated ' +
+                        'at 2016/10/06.')
 
                 elif message.content == System.prefix_question + 'help' or \
                         message.content == System.prefix_question + 'commands':
@@ -206,7 +206,7 @@ async def on_message(message):
                 channel_point = channel_find(message, TunnelInfo)
 
                 # await sophia.send_message(message.channel, str(channel_point))
-                if TunnelInfo.tunnel_receive[channel_point][0]:
+                if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][0]:
                     if channel_point != -1:
                         loop_max = len(TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])])
                         loop_count = 3
