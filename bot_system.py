@@ -89,7 +89,8 @@ async def server_invite(sophia, message):
         '\n' +
         'https://discord.gg/SpTWKDd')
 
-async def test_mode(system, discord, sophia, message, message_low):
+# TODO: Debug this thing
+async def testing_mode(system, discord, sophia, message, message_low):
     testing_mode_parameter = str(message_low)[15:]
     await sophia.send_message(message.channel, testing_mode_parameter)
 
@@ -216,7 +217,7 @@ async def prefix_change(system, sophia, message, message_low):
 async def change_name(sophia, message):
     find_qualifier = ' '
     name_position = message.content.find(find_qualifier, 0)
-    namechange = message.content[name_position + 1:]
+    name_change = message.content[name_position + 1:]
     # await sophia.send_message(message.channel, str(len(username)) + username)
-    await sophia.edit_profile(password='', username=namechange)
+    await sophia.edit_profile(password='', username=name_change)
     await sophia.send_message(message.channel, 'Bot name successfully changed')

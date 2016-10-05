@@ -147,7 +147,8 @@ async def room_join(room_info, sophia, message, message_low):
         else:
             # await sophia.send_message(message.channel, "User dun goofed")
             is_allowed = False
-    '''await sophia.send_message(message.channel, message.content[find_room_password + 1:] +
+    '''Debug code
+    await sophia.send_message(message.channel, message.content[find_room_password + 1:] +
         str(len(message.content[find_room_password + 1:])) + '\n' +
         minigame_session[int(room_id)][2] + str(len(minigame_session[int(room_id)][2])))'''
 
