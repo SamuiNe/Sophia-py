@@ -38,7 +38,8 @@ async def tunnel_link(discord, sophia, message, tunnel_info):
                     # await sophia.send_message(message.channel, 'Condition Level 4 pass')
                     tunnel_info.tunnel_receive[int(tunnel_id)].append(
                         discord.utils.get(message.server.channels, id=channel_id))
-                    tunnel_info.channel_relation[tunnel_id].append(message.channel.id, tunnel_id)
+                    append_point = len(tunnel_info.tunnel_receive[int(tunnel_id)]) - 1
+                    tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
                     tunnel_info.channel_linked.append(message.channel.id)
                     await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel ' +
                         tunnel_id + '.')
@@ -54,8 +55,9 @@ async def tunnel_link(discord, sophia, message, tunnel_info):
             if channel_id not in tunnel_info.channel_linked:
                 # await sophia.send_message(message.channel, 'Condition Level 3b pass')
                 tunnel_info.tunnel_receive[int(tunnel_id)].append(
-                        discord.utils.get(message.server.channels, id=channel_id))
-                tunnel_info.channel_relation[tunnel_id].append(message.channel.id, tunnel_id)
+                    discord.utils.get(message.server.channels, id=channel_id))
+                append_point = len(tunnel_info.tunnel_receive[int(tunnel_id)]) - 1
+                tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
                 tunnel_info.channel_linked.append(message.channel.id)
                 await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel ' +
                     tunnel_id + '.')

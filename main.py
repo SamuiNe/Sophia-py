@@ -14,7 +14,7 @@ System = bot_system.SystemVariables('>', '>?', '>!', '>!!', True, ['154488551596
         ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
-TunnelInfo = chat_tunnel.TunnelInformations([], [[]], [[False, 'Test Tunnel', 'Testing']])
+TunnelInfo = chat_tunnel.TunnelInformations([], [], [[False, 'Test Tunnel', 'Testing']])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
 
@@ -29,24 +29,26 @@ async def on_ready():
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     System.previous_playing_message = 'with pointers'
     if System.test_mode:
-        await sophia.change_presence(game=discord.Game(name='with alchemy'))
+        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠ '))
     else:
         await sophia.change_presence(game=discord.Game(name='with pointers'))
     token.close()
     print('Discord Bot (Sophia) Version 0.0.10, Ready.')
 
 
-def channel_find(channel_relation, channel_id, channel_point):
-    for row, counter in enumerate(channel_relation):
-        try:
-            column = counter.index(channel_id)
-        except ValueError:
-            continue
-        channel_point = [row, column]
-        return channel_point
+def channel_find(message, tunnel_info):
+    channel_max = len(tunnel_info.channel_relation)
+    channel_loop = 0
+    channel_value = -1
 
-    channel_point = -1
-    return channel_point
+    while channel_loop != channel_max and channel_value == -1:
+        if tunnel_info.channel_relation[channel_loop][0] == message.channel.id:
+            channel_value = channel_loop
+            return channel_value
+        else:
+            channel_loop += 1
+
+    return -1
 
 
 @sophia.event
@@ -66,19 +68,6 @@ async def on_message(message):
             is_person = False
 
     if is_person:
-        # TODO: Allow multiple combinations of servers for chat tunnelling
-
-        # Checks if the chat tunnelling mode is enabled and if the tunnel_receive_a and tunnel_receive_b is not none
-        if message.channel.id in TunnelInfo.channel_linked:
-            channel_point = None
-            await channel_find(TunnelInfo.channel_relation, message.channel.id, channel_point)
-
-            await sophia.send_message(message.channel, str(channel_point))
-
-            if channel_point != -1:
-                loop_max = len(TunnelInfo.tunnel_receive[channel_point[0]])
-
-                # Continue here later on
 
         if message.content.startswith(System.prefix_qualifier):
             if message.content.startswith(System.prefix_question):
@@ -212,6 +201,22 @@ async def on_message(message):
                 elif message.content == '\U0001F375':
                     await asyncio.sleep(1)
                     await sophia.send_message(message.channel, ':coffee:')
+
+            if message.channel.id in TunnelInfo.channel_linked:
+                channel_point = channel_find(message, TunnelInfo)
+
+                # await sophia.send_message(message.channel, str(channel_point))
+
+                if channel_point != -1:
+                    loop_max = len(TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])])
+                    loop_count = 3
+
+                    while loop_count != loop_max:
+                        if loop_count != TunnelInfo.channel_relation[channel_point][1]:
+                            await sophia.send_message(TunnelInfo.tunnel_receive[
+                                    int(TunnelInfo.channel_relation[channel_point][2])][loop_count],
+                                    str(message.channel) + ' >> ' + str(message.author) + ' - ' + str(message.content))
+                        loop_count += 1
 
 token = open('sophia.uwaa')
 sophia.run(token.readline())
