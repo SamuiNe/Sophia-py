@@ -105,8 +105,8 @@ async def tunnel_enable(sophia, message, message_low, tunnel_info):
     tunnel_password = ''
     tunnel_id = message.content[message_check[0] + 1: message_check[1]]
 
-    await sophia.send_message(message.channel, str(len(tunnel_id)) + ' ' + str(tunnel_id))
-    await sophia.send_message(message.channel, str(message_check))
+    # await sophia.send_message(message.channel, str(len(tunnel_id)) + ' ' + str(tunnel_id))
+    # await sophia.send_message(message.channel, str(message_check))
 
     if message_check[2] != -1:
         tunnel_option = message_low[message_check[1] + 1: message_check[2]]
@@ -114,7 +114,7 @@ async def tunnel_enable(sophia, message, message_low, tunnel_info):
     else:
         tunnel_option = message_low[message_check[1] + 1:]
 
-    await sophia.send_message(message.channel, str(len(tunnel_password)) + tunnel_password)
+    # await sophia.send_message(message.channel, str(len(tunnel_password)) + tunnel_password)
 
     if tunnel_info.tunnel_receive[int(tunnel_id)] is not None:
         if tunnel_option != '':
