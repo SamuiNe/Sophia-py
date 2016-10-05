@@ -10,11 +10,11 @@ import room
 import chat_tunnel
 
 logging.basicConfig(level=logging.INFO)
-System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['154488551596228610', '164476517101993984'],
+System = bot_system.SystemVariables('>', '>?', '>!', '>!!', True, ['154488551596228610', '164476517101993984'],
         ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
-TunnelInfo = chat_tunnel.TunnelInformations([], [[False, 'Testing', '']])
+TunnelInfo = chat_tunnel.TunnelInformations([], [[]], [[False, 'Test Tunnel', 'Testing']])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
 
@@ -27,13 +27,26 @@ async def on_ready():
     print('------')
     print(sophia)
     print('Created by SamuiNe <https://github.com/SamuiNe>')
-    System.previous_playing_mesage = 'with pointers'
+    System.previous_playing_message = 'with pointers'
     if System.test_mode:
         await sophia.change_presence(game=discord.Game(name='with alchemy'))
     else:
         await sophia.change_presence(game=discord.Game(name='with pointers'))
     token.close()
-    print('Discord Bot (Sophia) Version 0.0.9, Ready.')
+    print('Discord Bot (Sophia) Version 0.0.10, Ready.')
+
+
+def channel_find(channel_relation, channel_id, channel_point):
+    for row, counter in enumerate(channel_relation):
+        try:
+            column = counter.index(channel_id)
+        except ValueError:
+            continue
+        channel_point = [row, column]
+        return channel_point
+
+    channel_point = -1
+    return channel_point
 
 
 @sophia.event
@@ -56,14 +69,16 @@ async def on_message(message):
         # TODO: Allow multiple combinations of servers for chat tunnelling
 
         # Checks if the chat tunnelling mode is enabled and if the tunnel_receive_a and tunnel_receive_b is not none
-        """if TunnelInfo.tunnel_enable and TunnelInfo.tunnel_receive_a is not None and \
-                TunnelInfo.tunnel_receive_b is not None:
-                if TunnelInfo.tunnel_receive_a == message.channel:
-                    await sophia.send_message(TunnelInfo.tunnel_receive_b, str(message.author) +
-                        ' - ' + message.content)
-                elif TunnelInfo.tunnel_receive_b == message.channel:
-                    await sophia.send_message(TunnelInfo.tunnel_receive_a, str(message.author) +
-                        ' - ' + message.content)"""
+        if message.channel.id in TunnelInfo.channel_linked:
+            channel_point = None
+            await channel_find(TunnelInfo.channel_relation, message.channel.id, channel_point)
+
+            await sophia.send_message(message.channel, str(channel_point))
+
+            if channel_point != -1:
+                loop_max = len(TunnelInfo.tunnel_receive[channel_point[0]])
+
+                # Continue here later on
 
         if message.content.startswith(System.prefix_qualifier):
             if message.content.startswith(System.prefix_question):
@@ -84,7 +99,7 @@ async def on_message(message):
             elif message.content.startswith(System.prefix_information):
                 if message.content == System.prefix_information + 'hello':
                     mess_len = len(str(message.author))
-                    await sophia.send_message(message.channel, 'Hello ' + str(message.author)[:mess_len-5] + ' o/')
+                    await sophia.send_message(message.channel, 'Hello ' + str(message.author)[:mess_len - 5] + ' o/')
 
                 elif message_low == System.prefix_information + 'sarachan' or \
                         message_low == System.prefix_information + 'sara':
@@ -131,8 +146,8 @@ async def on_message(message):
                     elif message_low.startswith(System.prefix_debug + 'tunnellink'):
                         await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
 
-                    # elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
-                    #   await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
+                    elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
+                        await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
                         await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
@@ -152,7 +167,7 @@ async def on_message(message):
                         await sophia.send_message(message.channel, 'Playing message successfully updated')
 
                     elif message.content.startswith(System.prefix_debug + 'testmode'):
-                        await bot_system.test_mode(System, discord, sophia, message, message_low)
+                        await bot_system.testing_mode(System, discord, sophia, message, message_low)
 
                     elif message_low == System.prefix_debug + 'rest':
                         await sophia.send_message(message.channel, 'I will rest for now. Good night!')
