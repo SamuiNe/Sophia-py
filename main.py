@@ -29,11 +29,11 @@ async def on_ready():
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     System.previous_playing_message = 'with pointers'
     if System.test_mode:
-        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠ '))
+        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠'))
     else:
         await sophia.change_presence(game=discord.Game(name='with pointers'))
     token.close()
-    print('Discord Bot (Sophia) Version 0.0.11, Ready.')
+    print('Discord Bot (Sophia) Version 0.0.12, Ready.')
 
 
 def channel_find(message, tunnel_info):
@@ -215,7 +215,7 @@ async def on_message(message):
                             if loop_count != TunnelInfo.channel_relation[channel_point][1]:
                                 await sophia.send_message(TunnelInfo.tunnel_receive[
                                         int(TunnelInfo.channel_relation[channel_point][2])][loop_count],
-                                        str(message.channel) + ' >> ' +
+                                        str(message.server) + ' / ' + str(message.channel) + ' >> ' +
                                         str(message.author) + ' - ' + str(message.content))
                             loop_count += 1
 

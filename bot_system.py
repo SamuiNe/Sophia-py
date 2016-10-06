@@ -81,29 +81,27 @@ async def info_check(sophia, message):
 
 async def server_invite(sophia, message):
     await sophia.send_message(message.channel,
-        'You can take me to your discord server by clicking the link below' + '\n' +
-        'Please note that you will need at least "administrator" to add bots!' +
-        'https://discordapp.com/oauth2/authorize?client_id=225810441610199040&scope=bot&permissions=0' +
-        '\n\n' +
-        'Interested in joining my discord guild? You can visit it by using the invite link below!' +
-        '\n' +
+        'You can take me to your discord server by clicking the link below.' + '\n' +
+        'https://discordapp.com/oauth2/authorize?client_id=229134725569183745&scope=bot&permissions=0' + '\n\n' +
+        'Interested in joining my discord guild? You can visit it by using the invite link below!' + '\n' +
         'https://discord.gg/SpTWKDd')
 
-# TODO: Debug this thing
 async def testing_mode(system, discord, sophia, message, message_low):
-    testing_mode_parameter = str(message_low)[15:]
-    await sophia.send_message(message.channel, testing_mode_parameter)
+    message_qualifier = ' '
+    message_start = message_low.find(message_qualifier, 0)
+    testing_mode_parameter = str(message_low)[message_start + 1:]
+    # await sophia.send_message(message.channel, testing_mode_parameter)
 
     if testing_mode_parameter == 'yes' or testing_mode_parameter == '1':
         system.test_mode = True
 
-        await sophia.change_presence(game=discord.Game(name='with alchemy'))
-        await sophia.change_presence(message.channel, 'Testing mode enabled')
+        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠'))
+        await sophia.send_message(message.channel, 'Testing mode enabled')
 
     elif testing_mode_parameter == 'no' or testing_mode_parameter == '0':
         system.test_mode = False
 
-        await sophia.change_status(game=discord.Game(name=system.previous_playing_message))
+        await sophia.change_presence(game=discord.Game(name=system.previous_playing_message))
         await sophia.send_message(message.channel, 'Testing mode disabled')
 
 async def prefix_change(system, sophia, message, message_low):
