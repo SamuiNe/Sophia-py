@@ -33,22 +33,7 @@ async def on_ready():
     else:
         await sophia.change_presence(game=discord.Game(name='with pointers'))
     token.close()
-    print('Discord Bot (Sophia) Version 0.0.12, Ready.')
-
-
-async def channel_find(message, tunnel_info):
-    channel_max = len(tunnel_info.channel_relation)
-    channel_loop = 0
-    channel_value = -1
-
-    while channel_loop != channel_max and channel_value == -1:
-        if tunnel_info.channel_relation[channel_loop][0] == message.channel.id:
-            channel_value = channel_loop
-            return channel_value
-        else:
-            channel_loop += 1
-
-    return -1
+    print('Discord Bot (Sophia) Version 0.0.15, Ready.')
 
 
 @sophia.event
@@ -75,7 +60,7 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.0.12, which is last updated ' +
+                    await sophia.send_message(message.channel, 'My current version is 0.0.15, which is last updated ' +
                         'at 2016/10/07.')
 
                 elif message.content == System.prefix_question + 'help' or \
@@ -103,14 +88,15 @@ async def on_message(message):
                 elif message_low == System.prefix_information + 'pong':
                     await sophia.send_message(message.channel, 'ping!')
 
-                elif message_low.startswith(System.prefix_information + 'roomcreate'):
-                    await room.room_create(System, RoomInfo, sophia, message, message_low)
+                if message_low.startswith(System.prefix_information + 'room'):
+                    if message_low.startswith(System.prefix_information + 'roomcreate'):
+                        await room.room_create(System, RoomInfo, sophia, message, message_low)
 
-                elif message_low.startswith(System.prefix_information + 'roomjoin'):
-                    await room.room_join(RoomInfo, sophia, message, message_low)
+                    elif message_low.startswith(System.prefix_information + 'roomjoin'):
+                        await room.room_join(RoomInfo, sophia, message, message_low)
 
-                elif message_low.startswith(System.prefix_information + 'roomcheck'):
-                    await room.room_check(RoomInfo, sophia, message, message_low)
+                    elif message_low.startswith(System.prefix_information + 'roomcheck'):
+                        await room.room_check(RoomInfo, sophia, message, message_low)
 
                 elif message.author.id in System.ATSUI:
                     if message_low.startswith(System.prefix_debug + 'eval'):
@@ -132,14 +118,21 @@ async def on_message(message):
                     elif message_low == System.prefix_debug + 'secret':
                         await sophia.send_message(message.channel, 'Nothing to see here!')
 
-                    elif message_low.startswith(System.prefix_debug + 'tunnellink'):
-                        await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
+                    elif message_low.startswith(System.prefix_debug + 'tunnel'):
+                        if message_low.startswith(System.prefix_debug + 'tunnellink'):
+                            await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
 
-                    elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
-                        await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
+                        elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
+                            await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
 
-                    elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
-                        await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
+                        elif message_low.startswith(System.prefix_debug + 'tunnelleave'):
+                            await chat_tunnel.tunnel_leave(sophia, message, TunnelInfo)
+
+                        elif message_low.startswith(System.prefix_debug + 'tunnelcreate'):
+                            await chat_tunnel.tunnel_create(sophia, message, TunnelInfo)
+
+                        elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
+                            await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_debug + 'prefixchange'):
                         await bot_system.prefix_change(System, sophia, message, message_low)
@@ -203,7 +196,7 @@ async def on_message(message):
                     await sophia.send_message(message.channel, ':coffee:')
 
             if message.channel.id in TunnelInfo.channel_linked:
-                channel_point = await channel_find(message, TunnelInfo)
+                channel_point = await chat_tunnel.channel_find(message, TunnelInfo)
 
                 # await sophia.send_message(message.channel, str(channel_point))
                 if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][0]:
