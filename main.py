@@ -10,7 +10,7 @@ import room
 import chat_tunnel
 
 logging.basicConfig(level=logging.INFO)
-System = bot_system.SystemVariables('>', '>?', '>!', '>!!', True, ['154488551596228610', '164476517101993984'],
+System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['154488551596228610', '164476517101993984'],
         ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
@@ -29,26 +29,11 @@ async def on_ready():
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     System.previous_playing_message = 'with pointers'
     if System.test_mode:
-        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠ '))
+        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠'))
     else:
         await sophia.change_presence(game=discord.Game(name='with pointers'))
     token.close()
-    print('Discord Bot (Sophia) Version 0.0.11, Ready.')
-
-
-def channel_find(message, tunnel_info):
-    channel_max = len(tunnel_info.channel_relation)
-    channel_loop = 0
-    channel_value = -1
-
-    while channel_loop != channel_max and channel_value == -1:
-        if tunnel_info.channel_relation[channel_loop][0] == message.channel.id:
-            channel_value = channel_loop
-            return channel_value
-        else:
-            channel_loop += 1
-
-    return -1
+    print('Discord Bot (Sophia) Version 0.0.15, Ready.')
 
 
 @sophia.event
@@ -75,8 +60,8 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.0.11, which is last updated ' +
-                        'at 2016/10/06.')
+                    await sophia.send_message(message.channel, 'My current version is 0.0.15, which is last updated ' +
+                        'at 2016/10/07.')
 
                 elif message.content == System.prefix_question + 'help' or \
                         message.content == System.prefix_question + 'commands':
@@ -103,14 +88,15 @@ async def on_message(message):
                 elif message_low == System.prefix_information + 'pong':
                     await sophia.send_message(message.channel, 'ping!')
 
-                elif message_low.startswith(System.prefix_information + 'roomcreate'):
-                    await room.room_create(System, RoomInfo, sophia, message, message_low)
+                if message_low.startswith(System.prefix_information + 'room'):
+                    if message_low.startswith(System.prefix_information + 'roomcreate'):
+                        await room.room_create(System, RoomInfo, sophia, message, message_low)
 
-                elif message_low.startswith(System.prefix_information + 'roomjoin'):
-                    await room.room_join(RoomInfo, sophia, message, message_low)
+                    elif message_low.startswith(System.prefix_information + 'roomjoin'):
+                        await room.room_join(RoomInfo, sophia, message, message_low)
 
-                elif message_low.startswith(System.prefix_information + 'roomcheck'):
-                    await room.room_check(RoomInfo, sophia, message, message_low)
+                    elif message_low.startswith(System.prefix_information + 'roomcheck'):
+                        await room.room_check(RoomInfo, sophia, message, message_low)
 
                 elif message.author.id in System.ATSUI:
                     if message_low.startswith(System.prefix_debug + 'eval'):
@@ -132,14 +118,21 @@ async def on_message(message):
                     elif message_low == System.prefix_debug + 'secret':
                         await sophia.send_message(message.channel, 'Nothing to see here!')
 
-                    elif message_low.startswith(System.prefix_debug + 'tunnellink'):
-                        await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
+                    elif message_low.startswith(System.prefix_debug + 'tunnel'):
+                        if message_low.startswith(System.prefix_debug + 'tunnellink'):
+                            await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
 
-                    elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
-                        await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
+                        elif message_low.startswith(System.prefix_debug + 'tunnelenable'):
+                            await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
 
-                    elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
-                        await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
+                        elif message_low.startswith(System.prefix_debug + 'tunnelleave'):
+                            await chat_tunnel.tunnel_leave(sophia, message, TunnelInfo)
+
+                        elif message_low.startswith(System.prefix_debug + 'tunnelcreate'):
+                            await chat_tunnel.tunnel_create(sophia, message, TunnelInfo)
+
+                        elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
+                            await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_debug + 'prefixchange'):
                         await bot_system.prefix_change(System, sophia, message, message_low)
@@ -203,7 +196,7 @@ async def on_message(message):
                     await sophia.send_message(message.channel, ':coffee:')
 
             if message.channel.id in TunnelInfo.channel_linked:
-                channel_point = channel_find(message, TunnelInfo)
+                channel_point = await chat_tunnel.channel_find(message, TunnelInfo)
 
                 # await sophia.send_message(message.channel, str(channel_point))
                 if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][0]:
@@ -215,7 +208,7 @@ async def on_message(message):
                             if loop_count != TunnelInfo.channel_relation[channel_point][1]:
                                 await sophia.send_message(TunnelInfo.tunnel_receive[
                                         int(TunnelInfo.channel_relation[channel_point][2])][loop_count],
-                                        str(message.channel) + ' >> ' +
+                                        str(message.server) + ' / ' + str(message.channel) + ' >> ' +
                                         str(message.author) + ' - ' + str(message.content))
                             loop_count += 1
 
