@@ -34,7 +34,7 @@ class SystemVariables:
         (String)
         Entries of client ID allowed for debug prefix commands.
 
-    SystemVariables.server_exclude
+    SystemVariables.trigger_exclude
         [String]
         Entries of server ID excluded from having trigger commands.
 
@@ -43,7 +43,7 @@ class SystemVariables:
         Entry of previous playing message. For playing message storage when testing mode is turned on and off."""
 
     def __init__(self, prefix_qualifier, prefix_question, prefix_information, prefix_debug, test_mode,
-            allowed_testing, atsui, server_exclude, previous_playing_message):
+            allowed_testing, atsui, trigger_exclude, previous_playing_message):
         self.prefix_qualifier = prefix_qualifier
         self.prefix_question = prefix_question
         self.prefix_information = prefix_information
@@ -51,12 +51,12 @@ class SystemVariables:
         self.test_mode = test_mode
         self.allowed_testing = allowed_testing
         self.ATSUI = atsui
-        self.server_exclude = server_exclude
+        self.trigger_exclude = trigger_exclude
         self.previous_playing_message = previous_playing_message
 
 async def command_help(system, sophia, message):
     trigger_status = 'Enabled'
-    if message.server.id in system.server_exclude:
+    if message.server.id in system.trigger_exclude:
         trigger_status = 'Disabled'
 
     await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
@@ -74,7 +74,7 @@ async def command_help(system, sophia, message):
 async def info_check(sophia, message):
     await sophia.send_message(message.channel, '`Author`: ' + str(message.author) +
         ' `' + str(message.author.id) + '`\n' +
-        '`Bot`: ' + str(message.author.bot) + '\n' +
+        # '`Bot`: ' + str(message.author.bot) + '\n' +
         # '`MessLen`: ' + str(len(message.content)) + '\n' +
         '`Channel`: ' + str(message.channel) + ' `' + str(message.channel.id) + '`\n' +
         '`Server`: ' + str(message.server.name) + ' `' + str(message.server.id) + '`')
@@ -199,7 +199,8 @@ async def prefix_change(system, sophia, message, message_low):
         system.prefix_debug = temp_collection[3]
 
         await sophia.send_message(message.channel, 'Prefix change success')
-        '''await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
+        '''Debug code
+        await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
             ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
             str(temp_counter) + ' ' + str(exception_counter) + '\n' +
             str(exception_check) + '\n' +
@@ -219,3 +220,33 @@ async def change_name(sophia, message):
     # await sophia.send_message(message.channel, str(len(username)) + username)
     await sophia.edit_profile(password='', username=name_change)
     await sophia.send_message(message.channel, 'Bot name successfully changed')
+
+async def trigger_exception(system, sophia, message, message_low):
+    find_qualifier = ' '
+    option_position = message.content.find(find_qualifier, 0)
+
+    if find_qualifier != -1:
+        option_message = message_low[option_position + 1:]
+
+        if option_message == 'yes' or option_message == '1':
+            if message.server.id in system.trigger_exclude:
+                await sophia.send_message(message.channel, 'The trigger command has already' +
+                    'been disabled for this server.')
+            else:
+                system.trigger_exclude.append(message.server.id)
+                await sophia.send_message(message.channel, 'Trigger command is now disabled for this server.')
+
+        elif option_message == 'no' or option_message == '0':
+            if message.server.id in system.trigger_exclude:
+                system.trigger_exclude.remove(message.server.id)
+                await sophia.send_message(message.channel, 'Trigger command is now enabled for this server.')
+            else:
+                await sophia.send_message(message.channel, 'The trigger command has already' +
+                    'been disabled for this server.')
+
+        else:
+            await sophia.send_message(message.channel, 'Unable to change trigger command settings' +
+                'due to invalid option.')
+
+    else:
+        await sophia.send_message(message.channel, 'Unable to change trigger command settings due to missing option.')
