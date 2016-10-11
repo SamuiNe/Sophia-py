@@ -69,8 +69,9 @@ async def tunnel_link(discord, sophia, message, tunnel_info):
                     await sophia.send_message(message.channel, 'The channel has already linked to an existing tunnel.')
                     await sophia.delete_message(message)
         else:
-            sophia.send_message('Unable to link channel to tunnel room' +
+            await sophia.send_message('Unable to link channel to tunnel room' +
                 'since you did not have sufficient role permissions.')
+            await sophia.delete_message(message)
 
     else:
         await sophia.send_message(message.channel, 'The tunnel you want to link does not exist.')
@@ -259,9 +260,11 @@ async def tunnel_create(sophia, message, tunnel_info):
                     str(tunnel_count) + '.')
                 await sophia.delete_message(message)
         else:
+            await sophia.delete_message(message)
             await sophia.send_message(message.channel, 'Tunnel room creation failed since' +
                 ' you did not specify a room name.')
     else:
+        await sophia.delete_message(message)
         await sophia.send_message(message.channel, 'Unable to create tunnel room since ' +
             'you did not have sufficient role permissions.')
 
@@ -328,7 +331,7 @@ async def channel_find(message, tunnel_info):
 async def permission_check(message):
     if message.channel.permissions_for(message.author).administrator or \
             message.channel.permissions_for(message.author).manage_server or \
-            message.channel.permissions_for(message.author).manage_channel:
+            message.channel.permissions_for(message.author).manage_channels:
         return True
     else:
         return False
