@@ -33,7 +33,7 @@ async def on_ready():
     else:
         await sophia.change_presence(game=discord.Game(name='(´・◡・｀)'))
     token.close()
-    print('Sophia Version 0.0.16, Ready.')
+    print('Sophia Version 0.0.17, Ready.')
 
 
 @sophia.event
@@ -60,8 +60,8 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.0.16, which is last updated ' +
-                        'at 2016/10/10.')
+                    await sophia.send_message(message.channel, 'My current version is 0.0.17, which is last updated ' +
+                        'at 2016/10/12.')
 
                 elif message.content == System.prefix_question + 'help' or \
                         message.content == System.prefix_question + 'commands':

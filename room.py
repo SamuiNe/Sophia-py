@@ -1,9 +1,7 @@
 # coding=utf-8
 import string
 
-# TODO: Create room settings command
 # TODO: Add ability to remove room
-# TODO: Add ability to leave from room
 
 
 class RoomInformations:
