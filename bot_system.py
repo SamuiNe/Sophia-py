@@ -63,7 +63,7 @@ async def command_help(system, sophia, message):
         '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
         '`about`, `help` (`commands`), `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
         '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
-        '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `delete`'+
+        '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
         '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
         ' `roomcreate`, `roomjoin`, `roomcheck`\n\n' +
         '*Trigger commands* ' + trigger_status + '\n' +

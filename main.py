@@ -16,7 +16,7 @@ System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['15448855159
         ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
-TunnelInfo = chat_tunnel.TunnelInformations([], [], [[False, 'Test Tunnel', 'Testing']])
+TunnelInfo = chat_tunnel.TunnelInformations([], [], [[False, 'Global Chat', 'GlobalTest']])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
 
