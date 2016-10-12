@@ -61,15 +61,16 @@ async def command_help(system, sophia, message):
 
     await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
         '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
-        '`about`, `help` (`commands`), `botversion`, `infocheck`\n\n' +
+        '`about`, `help` (`commands`), `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
         '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
+        '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `delete`'+
         '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
         ' `roomcreate`, `roomjoin`, `roomcheck`\n\n' +
         '*Trigger commands* ' + trigger_status + '\n' +
         ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
         '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
         '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
-        '...with 15 secret commands!')
+        '...with 11 secret commands!')
 
 async def info_check(sophia, message):
     await sophia.send_message(message.channel, '`Author`: ' + str(message.author) +
