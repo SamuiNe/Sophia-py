@@ -95,7 +95,7 @@ async def testing_mode(system, discord, sophia, message, message_low):
     if testing_mode_parameter == 'yes' or testing_mode_parameter == '1':
         system.test_mode = True
 
-        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠'))
+        await sophia.change_presence(game=discord.Game(name='\u26A0 TEST MODE \u26A0'))
         await sophia.send_message(message.channel, 'Testing mode enabled')
 
     elif testing_mode_parameter == 'no' or testing_mode_parameter == '0':

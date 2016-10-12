@@ -41,7 +41,7 @@ async def tunnel_link(discord, sophia, message, tunnel_info):
                         append_point = len(tunnel_info.tunnel_receive[int(tunnel_id)]) - 1
                         tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
                         tunnel_info.channel_linked.append(message.channel.id)
-                        await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel ' +
+                        await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel room ' +
                             tunnel_id + '.')
                         await sophia.delete_message(message)
 
@@ -62,14 +62,14 @@ async def tunnel_link(discord, sophia, message, tunnel_info):
                     append_point = len(tunnel_info.tunnel_receive[int(tunnel_id)]) - 1
                     tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
                     tunnel_info.channel_linked.append(message.channel.id)
-                    await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel ' +
+                    await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel room ' +
                         tunnel_id + '.')
                     await sophia.delete_message(message)
                 else:
                     await sophia.send_message(message.channel, 'The channel has already linked to an existing tunnel.')
                     await sophia.delete_message(message)
         else:
-            await sophia.send_message('Unable to link channel to tunnel room' +
+            await sophia.send_message(message.channel, 'Unable to link channel to tunnel room ' +
                 'since you did not have sufficient role permissions.')
             await sophia.delete_message(message)
 
@@ -152,7 +152,7 @@ async def tunnel_enable(sophia, message, message_low, tunnel_info):
 
                     else:
                         await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
-                            'you are not the manager of the tunnel room.')
+                            'this channel is not manager of the tunnel room.')
                 else:
                     await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
                         'you did not have sufficient role permissions.')
@@ -184,7 +184,13 @@ async def tunnel_information(sophia, message, tunnel_info):
     is_password = False
 
     if tunnel_id != '':
-        if tunnel_info.tunnel_receive[int(tunnel_id)] is not None:
+        try:
+            tunnel_info.tunnel_receive[int(tunnel_id)] is not None
+        except IndexError:
+            await sophia.send_message(message.channel, 'The tunnel ID you have provided does not exist.')
+        except ValueError:
+            await sophia.send_message(message.channel, 'The tunnel ID you have provided is not a number.')
+        else:
             if tunnel_info.tunnel_receive[int(tunnel_id)][2] != '':
                 is_password = True
 
@@ -214,9 +220,6 @@ async def tunnel_information(sophia, message, tunnel_info):
                     loop_count += 1
 
             await sophia.send_message(message.channel, tunnel_stats)
-
-        else:
-            await sophia.send_message(message.channel, 'The tunnel ID you have entered does not exist.')
 
     else:
         await sophia.send_message(message.channel, 'Tunnel information search failed since the tunnel ID is missing.')
@@ -256,8 +259,8 @@ async def tunnel_create(sophia, message, tunnel_info):
 
         if tunnel_name != '':
                 tunnel_info.tunnel_receive.append([False, tunnel_name, tunnel_password])
-                await sophia.send_message(message.channel, 'Tunnel room has successfully created. Your tunnel ID is ' +
-                    str(tunnel_count) + '.')
+                await sophia.send_message(message.channel, str(tunnel_name) +
+                    ' has successfully created. Your tunnel ID is ' + str(tunnel_count) + '.')
                 await sophia.delete_message(message)
         else:
             await sophia.delete_message(message)
@@ -266,7 +269,7 @@ async def tunnel_create(sophia, message, tunnel_info):
     else:
         await sophia.delete_message(message)
         await sophia.send_message(message.channel, 'Unable to create tunnel room since ' +
-            'you did not have sufficient role permissions.')
+            'you do not have sufficient role permissions.')
 
 async def tunnel_leave(sophia, message, tunnel_info):
     message_qualifier = ' '
@@ -275,7 +278,7 @@ async def tunnel_leave(sophia, message, tunnel_info):
     channel_point = await channel_find(message, tunnel_info)
     role_permission = await permission_check(message)
 
-    # await sophia.send_message(message.channel, str(message_check))
+    # await sophia.send_message(message.channel, str(channel_point) + ' ' + str(message_check))
     if channel_point != -1:
         if role_permission:
             if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][2] != '':
@@ -313,6 +316,78 @@ async def tunnel_leave(sophia, message, tunnel_info):
     else:
         await sophia.send_message(message.channel, 'The channel is not in a tunnel room.')
 
+async def tunnel_delete_process(asyncio, random, sophia, tunnel_info, message, channel_point):
+    room_id = int(tunnel_info.channel_relation[channel_point][2])
+    loop_count = 3
+    loop_max = len(tunnel_info.tunnel_receive[room_id])
+    tunnel_channel_relation = []
+    tunnel_channel_link = []
+
+    while loop_count != loop_max:
+        tunnel_channel_relation.append(tunnel_info.channel_relation.index(
+                [tunnel_info.tunnel_receive[room_id][loop_count].id,
+                    loop_count, str(room_id)]))
+        tunnel_channel_link.append(tunnel_info.channel_linked.index(message.channel.id))
+
+        loop_count += 1
+    loop_count = 3
+
+    while loop_count != loop_max:
+        await sophia.send_message(tunnel_info.tunnel_receive[room_id][loop_count],
+            '\u26A0 The tunnel room manager has initiated tunnel room deletion. \n\n' +
+            'All linked channels will be unlinked and ' +
+            'the tunnel room will be deleted within 5 seconds.')
+        loop_count += 1
+    loop_count = loop_max - 1
+
+    await asyncio.sleep(5)
+
+    while loop_count != 2:
+        del tunnel_info.channel_relation[tunnel_channel_relation[loop_count - 3]]
+        del tunnel_info.channel_linked[tunnel_channel_link[loop_count - 3]]
+        del tunnel_info.tunnel_receive[room_id][loop_count]
+
+        loop_count -= 1
+    tunnel_info.tunnel_receive[room_id][0] = False
+    tunnel_info.tunnel_receive[room_id][1] = '-'
+    tunnel_info.tunnel_receive[room_id][2] = random.uniform(1, 10)
+    tunnel_info.tunnel_receive[room_id].append(None)
+
+    await sophia.send_message(message.channel, 'Tunnel room deletion successful.')
+
+async def tunnel_delete(asyncio, random, sophia, message, tunnel_info):
+    message_qualifier = ' '
+    message_content = message.content.find(message_qualifier, 0)
+    tunnel_password = message.content[message_content + 1:]
+    channel_point = await channel_find(message, tunnel_info)
+    role_permission = await permission_check(message)
+
+    # await sophia.send_message(message.channel, str(channel_point))
+    # await sophia.send_message(message.channel, str((tunnel_info.channel_relation[channel_point][2])))
+
+    if channel_point != -1:
+        if message.channel.id == tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][3].id:
+            if role_permission:
+                if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][2] != '':
+                    if tunnel_password == \
+                            tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][2]:
+                        await tunnel_delete_process(asyncio, random, sophia, tunnel_info, message, channel_point)
+
+                    else:
+                        await sophia.send_message(message.channel, 'The password you have entered is invalid.')
+
+                else:
+                    await tunnel_delete_process(asyncio, random, sophia, tunnel_info, message, channel_point)
+
+            else:
+                await sophia.send_message(message.channel, 'Unable to delete tunnel room since ' +
+                    'you did not have sufficient role permission.')
+        else:
+            await sophia.send_message(message.channel, 'Unable to delete tunnel room since ' +
+                'this channel is not the manager of this tunnel room.')
+
+    else:
+        await sophia.send_message(message.channel, 'This channel is currently not linked to any tunnel room.')
 
 async def channel_find(message, tunnel_info):
     channel_max = len(tunnel_info.channel_relation)

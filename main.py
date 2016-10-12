@@ -1,6 +1,8 @@
 # coding=utf-8
 """Text encoding UTF-8"""
 
+import random
+
 import asyncio
 import logging
 import discord
@@ -29,11 +31,11 @@ async def on_ready():
     print('Created by SamuiNe <https://github.com/SamuiNe>')
     System.previous_playing_message = '(´・◡・｀)'
     if System.test_mode:
-        await sophia.change_presence(game=discord.Game(name='⚠ TEST MODE ⚠'))
+        await sophia.change_presence(game=discord.Game(name='\u26A0 TEST MODE \u26A0'))
     else:
         await sophia.change_presence(game=discord.Game(name='(´・◡・｀)'))
     token.close()
-    print('Sophia Version 0.0.17, Ready.')
+    print('Sophia Version 0.1.0, Ready.')
 
 
 @sophia.event
@@ -60,7 +62,7 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.0.17, which is last updated ' +
+                    await sophia.send_message(message.channel, 'My current version is 0.1.0, which is last updated ' +
                         'at 2016/10/12.')
 
                 elif message.content == System.prefix_question + 'help' or \
@@ -133,6 +135,9 @@ async def on_message(message):
 
                         elif message_low.startswith(System.prefix_debug + 'tunnelinfo'):
                             await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
+
+                        elif message_low.startswith(System.prefix_debug + 'tunneldelete'):
+                            await chat_tunnel.tunnel_delete(asyncio, random, sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_debug + 'prefixchange'):
                         await bot_system.prefix_change(System, sophia, message, message_low)
