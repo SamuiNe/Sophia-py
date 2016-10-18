@@ -35,7 +35,7 @@ async def on_ready():
     else:
         await sophia.change_presence(game=discord.Game(name='(´・◡・｀)'))
     token.close()
-    print('Sophia Version 0.1.1, Ready.')
+    print('Sophia Version 0.1.2, Ready.')
 
 
 @sophia.event
@@ -62,8 +62,8 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.1.1, which is last updated ' +
-                        'at 2016/10/12.')
+                    await sophia.send_message(message.channel, 'My current version is 0.1.2, which is last updated ' +
+                        'at 2016/10/19.')
 
                 elif message.content == System.prefix_question + 'help' or \
                         message.content == System.prefix_question + 'commands':
@@ -216,8 +216,8 @@ async def on_message(message):
                             if loop_count != TunnelInfo.channel_relation[channel_point][1]:
                                 await sophia.send_message(TunnelInfo.tunnel_receive[
                                         int(TunnelInfo.channel_relation[channel_point][2])][loop_count],
-                                        str(message.server) + ' / ' + str(message.channel) + ' >> ' +
-                                        str(message.author) + ' - ' + str(message.content))
+                                        str(message.server) + ' / ' + str(message.channel) + '\n' +
+                                        ' >> ' + str(message.author) + ' - ' + str(message.content))
                             loop_count += 1
 
 token = open('sophia.uwaa')
