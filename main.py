@@ -35,7 +35,7 @@ async def on_ready():
     else:
         await sophia.change_presence(game=discord.Game(name='(´・◡・｀)'))
     token.close()
-    print('Sophia Version 0.1.2, Ready.')
+    print('Sophia Version 0.1.3, Ready.')
 
 
 @sophia.event
@@ -62,12 +62,14 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.1.2, which is last updated ' +
-                        'at 2016/10/19.')
+                    await sophia.send_message(message.channel, 'My current version is 0.1.3, which is last updated ' +
+                        'at 2016/10/22.')
 
-                elif message.content == System.prefix_question + 'help' or \
-                        message.content == System.prefix_question + 'commands':
+                elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
+
+                # elif message_low.startswith(System.prefix_question + 'command'):
+                #   await bot_system.individual_command_help(System, sophia, message)
 
                 elif message_low == System.prefix_question + 'infocheck':
                     await bot_system.info_check(sophia, message)
@@ -112,12 +114,16 @@ async def on_message(message):
                     elif message_low.startswith(System.prefix_information + 'tunneldelete'):
                         await chat_tunnel.tunnel_delete(asyncio, random, sophia, message, TunnelInfo)
 
-                if message_low.startswith(System.prefix_information + 'room'):
+                elif message_low.startswith(System.prefix_information + 'room'):
                     if message_low.startswith(System.prefix_information + 'roomcreate'):
                         await room.room_create(System, RoomInfo, sophia, message, message_low)
 
                     elif message_low.startswith(System.prefix_information + 'roomjoin'):
                         await room.room_join(RoomInfo, sophia, message, message_low)
+
+                elif message_low.startswith(System.prefix_information + 'triggertoggle'):
+                    permission_check = await chat_tunnel.permission_check(message)
+                    await bot_system.trigger_toggle(System, sophia, message, message_low, permission_check)
 
                 elif message.author.id in System.ATSUI:
                     if message_low.startswith(System.prefix_debug + 'eval'):
@@ -142,9 +148,6 @@ async def on_message(message):
                     elif message_low.startswith(System.prefix_debug + 'prefixchange'):
                         await bot_system.prefix_change(System, sophia, message, message_low)
 
-                    elif message_low.startswith(System.prefix_debug + 'triggerexclude'):
-                        await bot_system.trigger_exception(System, sophia, message, message_low)
-
                     elif message_low == System.prefix_debug + 'suspend':
                         await asyncio.sleep(5)
                         await sophia.send_message(message.channel, 'Suspend complete')
@@ -154,7 +157,7 @@ async def on_message(message):
                         System.previous_playing_message = game_message
 
                         await sophia.change_status(game=discord.Game(name=game_message), idle=False)
-                        await sophia.send_message(message.channel, 'Playing message successfully updated')
+                        await sophia.send_message(message.channel, 'Playing message has successfully updated.')
 
                     elif message.content.startswith(System.prefix_debug + 'testmode'):
                         await bot_system.testing_mode(System, discord, sophia, message, message_low)
@@ -217,7 +220,7 @@ async def on_message(message):
                                 await sophia.send_message(TunnelInfo.tunnel_receive[
                                         int(TunnelInfo.channel_relation[channel_point][2])][loop_count],
                                         str(message.server) + ' / ' + str(message.channel) + '\n' +
-                                        ' >> ' + str(message.author) + ' - ' + str(message.content))
+                                        '>> ' + str(message.author) + ' - ' + str(message.content))
                             loop_count += 1
 
 token = open('sophia.uwaa')

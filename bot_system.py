@@ -1,7 +1,6 @@
 # coding=utf-8
 """Text encoding UTF-8"""
 
-
 class SystemVariables:
     """SystemVariables(String, String, String, String, Boolean, [String], (String), [String], String)
     Class for constructing required system variables for the bot.
@@ -55,22 +54,38 @@ class SystemVariables:
         self.previous_playing_message = previous_playing_message
 
 async def command_help(system, sophia, message):
-    trigger_status = 'Enabled'
+    trigger_status = True
     if message.server.id in system.trigger_exclude:
-        trigger_status = 'Disabled'
+        trigger_status = False
 
-    await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
-        '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
-        '`about`, `help` (`commands`), `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
-        '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
-        '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
-        '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
-        ' `roomcreate`, `roomjoin`, `roomcheck`\n\n' +
-        '*Trigger commands* ' + trigger_status + '\n' +
-        ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
-        '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
-        '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
-        '...with 11 secret commands!')
+    if trigger_status:
+        await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
+            '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
+            '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
+            '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
+            '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
+            '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
+            ' `roomcreate`, `roomjoin`, `roomcheck`, `triggertoggle`\n\n' +
+            '*Trigger commands*\n' +
+            ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
+            '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
+            '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
+            '...with 10 secret commands! \n\n' +
+            'For information of individual commands, please enter `' + system.prefix_question +
+            'command <command>`.')
+    else:
+        await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
+            '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
+            '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
+            '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
+            '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
+            '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
+            ' `roomcreate`, `roomjoin`, `roomcheck`, `triggertoggle`\n' +
+            '...with 10 secret commands! \n\n' +
+            'For information of individual commands, please enter `' + system.prefix_question +
+            'command <command>`.')
+
+# async def individual_command_help(system, sophia, message):
 
 async def info_check(sophia, message):
     await sophia.send_message(message.channel, '`Author`: ' + str(message.author) +
@@ -222,32 +237,37 @@ async def change_name(sophia, message):
     await sophia.edit_profile(password='', username=name_change)
     await sophia.send_message(message.channel, 'Bot name successfully changed')
 
-async def trigger_exception(system, sophia, message, message_low):
+async def trigger_toggle(system, sophia, message, message_low, permission):
     find_qualifier = ' '
     option_position = message.content.find(find_qualifier, 0)
 
-    if find_qualifier != -1:
-        option_message = message_low[option_position + 1:]
+    if permission:
+        if find_qualifier != -1:
+            option_message = message_low[option_position + 1:]
 
-        if option_message == 'yes' or option_message == '1':
-            if message.server.id in system.trigger_exclude:
-                await sophia.send_message(message.channel, 'The trigger command has already' +
-                    'been disabled for this server.')
-            else:
-                system.trigger_exclude.append(message.server.id)
-                await sophia.send_message(message.channel, 'Trigger command is now disabled for this server.')
+            if option_message == 'disable' or option_message == 'no' or option_message == '0':
+                if message.server.id in system.trigger_exclude:
+                    await sophia.send_message(message.channel, 'The trigger command has already ' +
+                        'been disabled for this server.')
+                else:
+                    system.trigger_exclude.append(message.server.id)
+                    await sophia.send_message(message.channel, 'Trigger command is now disabled for this server.')
 
-        elif option_message == 'no' or option_message == '0':
-            if message.server.id in system.trigger_exclude:
-                system.trigger_exclude.remove(message.server.id)
-                await sophia.send_message(message.channel, 'Trigger command is now enabled for this server.')
+            elif option_message == 'enable' or option_message == 'yes' or option_message == '1':
+                if message.server.id in system.trigger_exclude:
+                    system.trigger_exclude.remove(message.server.id)
+                    await sophia.send_message(message.channel, 'Trigger command is now enabled for this server.')
+                else:
+                    await sophia.send_message(message.channel, 'The trigger command has already ' +
+                        'been enabled for this server.')
+
             else:
-                await sophia.send_message(message.channel, 'The trigger command has already' +
-                    'been disabled for this server.')
+                await sophia.send_message(message.channel, 'Unable to change trigger command settings ' +
+                    'due to invalid option.')
 
         else:
-            await sophia.send_message(message.channel, 'Unable to change trigger command settings' +
-                'due to invalid option.')
-
+            await sophia.send_message(message.channel,
+                'Unable to change trigger command settings due to missing option.')
     else:
-        await sophia.send_message(message.channel, 'Unable to change trigger command settings due to missing option.')
+        await sophia.send_message(message.channel,
+            'Unable to change trigger command since you do not have sufficient role permissions.')
