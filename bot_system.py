@@ -72,7 +72,7 @@ async def command_help(system, sophia, message):
             '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
             '...with 10 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
-            'command <command>`.')
+            'command `*`command`*.')
     else:
         await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
             '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
@@ -83,9 +83,27 @@ async def command_help(system, sophia, message):
             ' `roomcreate`, `roomjoin`, `roomcheck`, `triggertoggle`\n' +
             '...with 10 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
-            'command <command>`.')
+            'command `*`command`*.')
 
-# async def individual_command_help(system, sophia, message):
+async def individual_command_help(system, sophia, message):
+    message_qualifier = ' '
+    space_position = message.content.find(message_qualifier, 0)
+
+    if space_position != -1:
+        message_content = message.content[space_position + 1:]
+
+        if message_content == 'help':
+            await sophia.send_message(message.channel, 'Category: Question\n' +
+                'Command format: `' + system.prefix_question + 'help`\n\n' +
+                'Displays current command list and current amount of secret commands.')
+        else:
+            await sophia.send_message(message.channel, 'The command you have specified is invalid or missing ' +
+                'help informations.')
+
+    else:
+        await sophia.send_message(message.channel, 'Unable to show command help since the command you want is ' +
+            'not specified.\n' +
+            'Usage: `' + system.prefix_question + 'command *`command`*')
 
 async def info_check(sophia, message):
     await sophia.send_message(message.channel, '`Author`: ' + str(message.author) +
