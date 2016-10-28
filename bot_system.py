@@ -64,13 +64,13 @@ async def command_help(system, sophia, message):
             '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
             '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
             '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
-            '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
+            '`hello`, `invite`, `ping` (`pong`),' +
             ' `roomcreate`, `roomjoin`, `roomcheck`, `triggertoggle`\n\n' +
             '*Trigger commands*\n' +
             ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
             '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
             '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
-            '...with 10 secret commands! \n\n' +
+            '...with 11 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
             'command `*`command`*.')
     else:
@@ -79,9 +79,9 @@ async def command_help(system, sophia, message):
             '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
             '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
             '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
-            '`hello`, `sara` (`sarachan`), `invite`, `ping` (`pong`),' +
+            '`hello`, `invite`, `ping` (`pong`),' +
             ' `roomcreate`, `roomjoin`, `roomcheck`, `triggertoggle`\n' +
-            '...with 10 secret commands! \n\n' +
+            '...with 11 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
             'command `*`command`*.')
 
@@ -92,10 +92,115 @@ async def individual_command_help(system, sophia, message):
     if space_position != -1:
         message_content = message.content[space_position + 1:]
 
-        if message_content == 'help':
+        if message_content == 'about':
+            await sophia.send_message(message.channel, 'Category: Question\n' +
+                'Command format: `' + system.prefix_question + 'about`\n\n' +
+                'Allows Sophia to greet herself.')
+
+        elif message_content == 'help':
             await sophia.send_message(message.channel, 'Category: Question\n' +
                 'Command format: `' + system.prefix_question + 'help`\n\n' +
                 'Displays current command list and current amount of secret commands.')
+
+        elif message_content == 'command':
+            await sophia.send_message(message.channel, 'Category: Question\n' +
+                'Command format: `' + system.prefix_question + 'command `*`command`*\n\n' +
+                'Displays detailed help information for individual command.')
+
+        elif message_content == 'botversion':
+            await sophia.send_message(message.channel, 'Category: Question\n' +
+                'Command format: `' + system.prefix_question + 'botversion`\n\n' +
+                'Displays the bot\'s current bot version and last update date.')
+
+        elif message_content == 'infocheck':
+            await sophia.send_message(message.channel, 'Category: Question\n' +
+                'Command format: `' + system.prefix_question + 'infocheck`\n\n' +
+                'Displays the author\'s current discord name, discrim number and ID.\n' +
+                'Also displays server ID and channel ID.')
+
+        elif message_content == 'tunnelcheck':
+            await sophia.send_message(message.channel, 'Category: Question\n' +
+                'Command format: `' + system.prefix_question + 'tunnelcheck `*`tunnel_id`*\n\n' +
+                'Displays the tunnel information for the specified tunnel ID.')
+
+        elif message_content == 'roomcheck':
+            await sophia.send_message(message.channel, 'Category: Question\n' +
+                'Command format: `' + system.prefix_question + 'roomcheck `*`room_id`*\n\n' +
+                'Displays the room information for the specified room ID.')
+
+        elif message_content == 'tunnellink':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'tunnellink `*`room_id room_password`*\n' +
+                'Required user permission(s): *Administrator* or *Manage Server* or *Manage Channel*.\n\n'+
+                'Links the current channel to a tunnel room.')
+
+        elif message_content == 'tunnelenable':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information +
+                'tunnelenable `*`room_id option room_password`* \n\n' +
+                'Displays current command list and current amount of secret commands.')
+
+        elif message_content == 'tunnelleave':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'tunnelleave `*`room_password`* \n\n' +
+                'Displays current command list and current amount of secret commands.')
+
+        elif message_content == 'tunnelcreate':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'tunnelcreate `*`room_name room_password`*\n'
+                'Note: *`room_password`* is optional. Room ID is autogenerated.\n\n' +
+                'Creates a tunnel room with user specified room name.')
+
+        elif message_content == 'tunneldelete':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'tunneldelete `*`room_name room_password`*\n' +
+                'Note: Requires tunnel room manager (currently first channel in the tunnel room list).\n\n'
+                'Deletes a tunnel room.')
+
+        elif message_content == 'hello':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'hello`\n\n' +
+                'Allows Sophia to say hello to the user.')
+
+        elif message_content == 'invite':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'invite`\n\n' +
+                'Displays Sophia\'s invite link and server link.')
+
+        elif message_content == 'ping' or message_content == 'pong':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'ping` or `' +
+                system.prefix_information + 'pong`\n\n' +
+                'Ping! Pong!')
+
+        elif message_content == 'roomcreate':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'roomcreate `*`room_name room_password`*\n\n' +
+                'Creates a minigame room.')
+
+        elif message_content == 'roomjoin':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'roomjoin `*`room_id room_password`*\n\n' +
+                'Join a minigame room.')
+
+        elif message_content == 'roomcheck':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'roomcheck `*`room_id`*\n\n' +
+                'Check room information for the specified room ID.')
+
+        elif message_content == 'triggertoggle':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'triggertoggle `*`room_id`*\n'
+                'Required user permission(s): *Administrator* or *Manage Server* or *Manage Channel*.\n' +
+                'Note: This toggle is server wide.\n\n' +
+                'Toggles trigger command.')
+
+        elif message_content == 'sara' or message_content == 'sarachan':
+            await sophia.send_message(message.channel, 'Category: ???\n' +
+                'Command format: `' + system.prefix_information + 'sara` or `' +
+                system.prefix_information + 'sarachan`\n\n' +
+                'Be-Music Source (BMS) meme. You have found a secret!')
+
         else:
             await sophia.send_message(message.channel, 'The command you have specified is invalid or missing ' +
                 'help informations.')
@@ -103,7 +208,7 @@ async def individual_command_help(system, sophia, message):
     else:
         await sophia.send_message(message.channel, 'Unable to show command help since the command you want is ' +
             'not specified.\n' +
-            'Usage: `' + system.prefix_question + 'command *`command`*')
+            'Usage: `' + system.prefix_question + 'command `*`command`*')
 
 async def info_check(sophia, message):
     await sophia.send_message(message.channel, '`Author`: ' + str(message.author) +
