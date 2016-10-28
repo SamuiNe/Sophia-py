@@ -19,6 +19,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [[False, 'Global Chat', 'GlobalTest']])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
+__version__ = '0.1.6'
 
 
 @sophia.event
@@ -35,7 +36,7 @@ async def on_ready():
     else:
         await sophia.change_presence(game=discord.Game(name='(´・◡・｀)'))
     token.close()
-    print('Sophia Version 0.1.6, Ready.')
+    print('Sophia Version ' + __version__ + ', Ready.')
 
 
 @sophia.event
@@ -62,8 +63,8 @@ async def on_message(message):
                     await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
                 elif message_low == System.prefix_question + 'botversion':
-                    await sophia.send_message(message.channel, 'My current version is 0.1.6, which is last updated ' +
-                        'at 2016/10/29.')
+                    await sophia.send_message(message.channel, 'My current version is ' + __version__ +
+                        ', which is last updated ' + 'at 2016/10/29.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
