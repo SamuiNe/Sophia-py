@@ -30,7 +30,10 @@ async def tunnel_link(discord, sophia, message, tunnel_info):
     except IndexError:
         tunnel_deleted = False
     else:
-        tunnel_deleted = True
+        if tunnel_info.tunnel_receive[int(tunnel_id)][3] is None:
+            tunnel_deleted = True
+        else:
+            tunnel_deleted = False
 
     # await sophia.send_message(message.channel, str(len(tunnel_id)) + ' ' + tunnel_id)
 
