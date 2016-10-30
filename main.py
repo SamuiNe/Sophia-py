@@ -21,7 +21,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [[[True, False, 'Global Chat', 'GlobalTest']]])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.1.8'
+__version__ = '0.1.9'
 
 
 @sophia.event
