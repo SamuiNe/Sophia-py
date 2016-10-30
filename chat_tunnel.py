@@ -11,13 +11,13 @@ class TunnelInformations:
         self.tunnel_receive = tunnel_receive
 
 
-async def tunnel_link(discord, sophia, message, tunnel_info):
+async def tunnel_link(system, discord, sophia, message, tunnel_info):
     message_qualifier = ' '
     message_index = message.content.find(message_qualifier, 0)
     message_password = message.content.find(message_qualifier, message_index + 1)
     channel_id = message.channel.id
     tunnel_password = ''
-    role_permission = await permission_check(message)
+    role_permission = await permission_check(system, message)
 
     if message_password != -1:
         tunnel_id = message.content[message_index + 1: message_password]
@@ -122,7 +122,7 @@ async def tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tun
         await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
             'the tunnel status option you have specified is invalid.')
 
-async def tunnel_enable(sophia, message, message_low, tunnel_info):
+async def tunnel_enable(system, sophia, message, message_low, tunnel_info):
     message_qualifier = ' '
     message_check = [0, None, None]
     message_check[0] = message.content.find(message_qualifier, 0)
@@ -131,7 +131,7 @@ async def tunnel_enable(sophia, message, message_low, tunnel_info):
     channel_id = message.channel.id
     tunnel_password = ''
     tunnel_id = message.content[message_check[0] + 1: message_check[1]]
-    role_permission = await permission_check(message)
+    role_permission = await permission_check(system, message)
 
     # await sophia.send_message(message.channel, str(len(tunnel_id)) + ' ' + str(tunnel_id))
     # await sophia.send_message(message.channel, str(message_check))
@@ -257,12 +257,12 @@ async def tunnel_information(sophia, message, tunnel_info):
         '\n' + '`Linked channel B`: ' + str(tunnel_info.tunnel_receive_b) + ' `' + tunnel_id_b + '`' +
         '\n' + '`Tunnel Boolean`: ' + str(tunnel_info.tunnel_enable))'''
 
-async def tunnel_create(sophia, message, tunnel_info):
+async def tunnel_create(system, sophia, message, tunnel_info):
     find_qualifier = ' '
     message_check = [0, None]
     message_check[0] = message.content.find(find_qualifier, 0)
     message_check[1] = message.content.find(find_qualifier, message_check[0] + 1)
-    role_permission = await permission_check(message)
+    role_permission = await permission_check(system, message)
 
     if role_permission:
         if message_check[1] != -1:
@@ -288,12 +288,12 @@ async def tunnel_create(sophia, message, tunnel_info):
         await sophia.send_message(message.channel, 'Unable to create tunnel room since ' +
             'you do not have sufficient role permissions.')
 
-async def tunnel_leave(sophia, message, tunnel_info):
+async def tunnel_leave(system, sophia, message, tunnel_info):
     message_qualifier = ' '
     message_check = message.content.find(message_qualifier, 0)
     tunnel_password = message.content[message_check + 1:]
     channel_point = await channel_find(message, tunnel_info)
-    role_permission = await permission_check(message)
+    role_permission = await permission_check(system, message)
 
     # await sophia.send_message(message.channel, str(channel_point) + ' ' + str(message_check))
     if channel_point != -1:
@@ -372,12 +372,12 @@ async def tunnel_delete_process(asyncio, random, sophia, tunnel_info, message, c
 
     await sophia.send_message(message.channel, 'Tunnel room deletion successful.')
 
-async def tunnel_delete(asyncio, random, sophia, message, tunnel_info):
+async def tunnel_delete(asyncio, random, system, sophia, message, tunnel_info):
     message_qualifier = ' '
     message_content = message.content.find(message_qualifier, 0)
     tunnel_password = message.content[message_content + 1:]
     channel_point = await channel_find(message, tunnel_info)
-    role_permission = await permission_check(message)
+    role_permission = await permission_check(system, message)
 
     # await sophia.send_message(message.channel, str(channel_point))
     # await sophia.send_message(message.channel, str((tunnel_info.channel_relation[channel_point][2])))
@@ -420,10 +420,10 @@ async def channel_find(message, tunnel_info):
 
     return -1
 
-async def permission_check(message):
+async def permission_check(system, message):
     if message.channel.permissions_for(message.author).administrator or \
             message.channel.permissions_for(message.author).manage_server or \
-            message.channel.permissions_for(message.author).manage_channels:
+            message.channel.permissions_for(message.author).manage_channels or system.ATSUI:
         return True
     else:
         return False

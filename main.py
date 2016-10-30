@@ -1,12 +1,15 @@
 # coding=utf-8
 """Text encoding UTF-8"""
 
+# python built-in modules
 import random
-
-import asyncio
 import logging
+
+# other modules
+import asyncio
 import discord
 
+# sophia modules
 import bot_system
 import room
 import chat_tunnel
@@ -19,7 +22,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [[False, 'Global Chat', 'GlobalTest']])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 
 
 @sophia.event
@@ -64,7 +67,7 @@ async def on_message(message):
 
                 elif message_low == System.prefix_question + 'botversion':
                     await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-                        ', which is last updated ' + 'at 2016/10/29.')
+                        ', which is last updated at 2016/10/30.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
@@ -101,19 +104,19 @@ async def on_message(message):
 
                 elif message_low.startswith(System.prefix_information + 'tunnel'):
                     if message_low.startswith(System.prefix_information + 'tunnellink'):
-                        await chat_tunnel.tunnel_link(discord, sophia, message, TunnelInfo)
+                        await chat_tunnel.tunnel_link(System, discord, sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_information + 'tunnelenable'):
-                        await chat_tunnel.tunnel_enable(sophia, message, message_low, TunnelInfo)
-
-                    elif message_low.startswith(System.prefix_information + 'tunnelleave'):
-                        await chat_tunnel.tunnel_leave(sophia, message, TunnelInfo)
+                        await chat_tunnel.tunnel_enable(System, sophia, message, message_low, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_information + 'tunnelcreate'):
-                        await chat_tunnel.tunnel_create(sophia, message, TunnelInfo)
+                        await chat_tunnel.tunnel_create(System, sophia, message, TunnelInfo)
+
+                    elif message_low.startswith(System.prefix_information + 'tunnelleave'):
+                        await chat_tunnel.tunnel_leave(System, sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_information + 'tunneldelete'):
-                        await chat_tunnel.tunnel_delete(asyncio, random, sophia, message, TunnelInfo)
+                        await chat_tunnel.tunnel_delete(asyncio, random, System, sophia, message, TunnelInfo)
 
                 elif message_low.startswith(System.prefix_information + 'room'):
                     if message_low.startswith(System.prefix_information + 'roomcreate'):
