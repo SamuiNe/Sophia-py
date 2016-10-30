@@ -423,7 +423,10 @@ async def channel_find(message, tunnel_info):
 async def permission_check(system, message):
     if message.channel.permissions_for(message.author).administrator or \
             message.channel.permissions_for(message.author).manage_server or \
-            message.channel.permissions_for(message.author).manage_channels or system.ATSUI:
+            message.channel.permissions_for(message.author).manage_channels:
         return True
     else:
+        if system.ATSUI == message.author.id:
+            return True
+
         return False
