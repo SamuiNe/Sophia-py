@@ -185,7 +185,7 @@ async def tunnel_information(sophia, message, tunnel_info):
                 loop_count = 1
                 loop_limit = len(tunnel_info.tunnel_receive[int(tunnel_id)])
 
-                tunnel_stats = '`Tunnel Room Name`: ' + tunnel_info.tunnel_receive[int(tunnel_id)][0][2] + \
+                tunnel_stats = '`Tunnel Room`: ' + tunnel_info.tunnel_receive[int(tunnel_id)][0][2] + \
                     is_password + '\n' + \
                     '`ID`: ' + str(tunnel_id) + is_enabled + '\n' \
                     '`Channels`: ' + str(loop_limit - 1) + \
