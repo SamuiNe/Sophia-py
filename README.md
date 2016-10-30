@@ -6,9 +6,9 @@ A simple chat bot for Discord
 ## Description
 Nothing much to say at the moment （´・ω・｀）
 
-## Features
+## Feature(s)
 ✓ Global Chat system with custom room compability 
 
-## Requirements
+## Requirement(s)
 - discord.py library Version 0.11.0 or newer and its requirements
 - Python 3.5.2
