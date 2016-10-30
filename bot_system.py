@@ -60,28 +60,26 @@ async def command_help(system, sophia, message):
 
     if trigger_status:
         await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
-            '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
-            '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
-            '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
+            'Question commands (starts with `' + system.prefix_question + '`)\n' +
+            '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`\n\n' +
+            'Information commands (starts with `' + system.prefix_information + '`)\n' +
             '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
-            '`hello`, `invite`, `ping` (`pong`),' +
-            ' `roomcreate`, `roomjoin`, `roomcheck`, `triggertoggle`\n\n' +
-            '*Trigger commands*\n' +
+            '`hello`, `invite`, `ping` (`pong`),' + '`triggertoggle`\n\n' +
+            'Trigger commands\n' +
             ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
             '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
             '`\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029`\n' +
-            '...with 11 secret commands! \n\n' +
+            '...with 14 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
             'command `*`command`*.')
     else:
         await sophia.send_message(message.channel, 'Here are the commands I recognize at the moment:\n\n' +
-            '*Question commands* (starts with `' + system.prefix_question + '`)\n' +
-            '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`, `roomcheck`\n\n' +
-            '*Information commands* (starts with `' + system.prefix_information + '`)\n' +
+            'Question commands (starts with `' + system.prefix_question + '`)\n' +
+            '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`\n\n' +
+            'Information commands (starts with `' + system.prefix_information + '`)\n' +
             '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
-            '`hello`, `invite`, `ping` (`pong`),' +
-            ' `roomcreate`, `roomjoin`, `roomcheck`, `triggertoggle`\n' +
-            '...with 11 secret commands! \n\n' +
+            '`hello`, `invite`, `ping` (`pong`),' + '`triggertoggle`\n' +
+            '...with 14 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
             'command `*`command`*.')
 
@@ -137,13 +135,16 @@ async def individual_command_help(system, sophia, message):
         elif message_content == 'tunnelenable':
             await sophia.send_message(message.channel, 'Category: Information\n' +
                 'Command format: `' + system.prefix_information +
-                'tunnelenable `*`room_id option room_password`* \n\n' +
-                'Displays current command list and current amount of secret commands.')
+                'tunnelenable `*`room_id option room_password`* \n' +
+                'Required user permission(s): *Administrator* or *Manage Server* or *Manage Channel*.\n' +
+                'Note: Requires tunnel room manager (currently first channel in the tunnel room list).\n\n' +
+                'Toggles the current room\'s tunnel enable option.')
 
         elif message_content == 'tunnelleave':
             await sophia.send_message(message.channel, 'Category: Information\n' +
-                'Command format: `' + system.prefix_information + 'tunnelleave `*`room_password`* \n\n' +
-                'Displays current command list and current amount of secret commands.')
+                'Command format: `' + system.prefix_information + 'tunnelleave `*`room_password`* \n' +
+                'Required user permission(s): *Administrator* or *Manage Server* or *Manage Channel*.\n\n' +
+                'Leave the current tunnel room.')
 
         elif message_content == 'tunnelcreate':
             await sophia.send_message(message.channel, 'Category: Information\n' +
@@ -153,7 +154,8 @@ async def individual_command_help(system, sophia, message):
 
         elif message_content == 'tunneldelete':
             await sophia.send_message(message.channel, 'Category: Information\n' +
-                'Command format: `' + system.prefix_information + 'tunneldelete `*`room_name room_password`*\n' +
+                'Command format: `' + system.prefix_information + 'tunneldelete `*`room_password`*\n' +
+                'Required user permission(s): *Administrator* or *Manage Server* or *Manage Channel*.\n\n' +
                 'Note: Requires tunnel room manager (currently first channel in the tunnel room list).\n\n'
                 'Deletes a tunnel room.')
 
@@ -174,17 +176,17 @@ async def individual_command_help(system, sophia, message):
                 'Ping! Pong!')
 
         elif message_content == 'roomcreate':
-            await sophia.send_message(message.channel, 'Category: Information\n' +
+            await sophia.send_message(message.channel, 'Category: ???\n' +
                 'Command format: `' + system.prefix_information + 'roomcreate `*`room_name room_password`*\n\n' +
                 'Creates a minigame room.')
 
         elif message_content == 'roomjoin':
-            await sophia.send_message(message.channel, 'Category: Information\n' +
+            await sophia.send_message(message.channel, 'Category: ???\n' +
                 'Command format: `' + system.prefix_information + 'roomjoin `*`room_id room_password`*\n\n' +
                 'Join a minigame room.')
 
         elif message_content == 'roomcheck':
-            await sophia.send_message(message.channel, 'Category: Information\n' +
+            await sophia.send_message(message.channel, 'Category: ???\n' +
                 'Command format: `' + system.prefix_information + 'roomcheck `*`room_id`*\n\n' +
                 'Check room information for the specified room ID.')
 

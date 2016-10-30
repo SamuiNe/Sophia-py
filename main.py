@@ -2,7 +2,6 @@
 """Text encoding UTF-8"""
 
 # python built-in modules
-import random
 import logging
 
 # other modules
@@ -19,10 +18,10 @@ System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['15448855159
         ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
-TunnelInfo = chat_tunnel.TunnelInformations([], [], [[False, 'Global Chat', 'GlobalTest']])
+TunnelInfo = chat_tunnel.TunnelInformations([], [], [[[True, False, 'Global Chat', 'GlobalTest']]])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 
 
 @sophia.event
@@ -67,7 +66,7 @@ async def on_message(message):
 
                 elif message_low == System.prefix_question + 'botversion':
                     await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-                        ', which is last updated at 2016/10/30.')
+                        ', which is last updated at 2016/10/31.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
@@ -80,9 +79,6 @@ async def on_message(message):
 
                 elif message_low.startswith(System.prefix_question + 'tunnelcheck'):
                     await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
-
-                elif message_low.startswith(System.prefix_question + 'roomcheck'):
-                    await room.room_check(RoomInfo, sophia, message, message_low)
 
             elif message.content.startswith(System.prefix_information):
                 if message.content == System.prefix_information + 'hello':
@@ -116,14 +112,7 @@ async def on_message(message):
                         await chat_tunnel.tunnel_leave(System, sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_information + 'tunneldelete'):
-                        await chat_tunnel.tunnel_delete(asyncio, random, System, sophia, message, TunnelInfo)
-
-                elif message_low.startswith(System.prefix_information + 'room'):
-                    if message_low.startswith(System.prefix_information + 'roomcreate'):
-                        await room.room_create(System, RoomInfo, sophia, message, message_low)
-
-                    elif message_low.startswith(System.prefix_information + 'roomjoin'):
-                        await room.room_join(RoomInfo, sophia, message, message_low)
+                        await chat_tunnel.tunnel_delete(asyncio, System, sophia, message, TunnelInfo)
 
                 elif message_low.startswith(System.prefix_information + 'triggertoggle'):
                     permission_check = await chat_tunnel.permission_check(message)
@@ -145,6 +134,15 @@ async def on_message(message):
                                     'I refuse to eval that one!')
                         else:
                             await sophia.send_message(message.channel, 'There is nothing to eval!')
+
+                    elif message_low.startswith(System.prefix_debug + 'roomcheck'):
+                        await room.room_check(RoomInfo, sophia, message, message_low)
+
+                    elif message_low.startswith(System.prefix_debug + 'roomcreate'):
+                        await room.room_create(System, RoomInfo, sophia, message, message_low)
+
+                    elif message_low.startswith(System.prefix_debug + 'roomjoin'):
+                        await room.room_join(RoomInfo, sophia, message, message_low)
 
                     elif message_low == System.prefix_debug + 'secret':
                         await sophia.send_message(message.channel, 'Nothing to see here!')
