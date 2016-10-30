@@ -386,7 +386,7 @@ async def permission_check(system, message):
             message.channel.permissions_for(message.author).manage_channels:
         return True
     else:
-        if system.ATSUI == message.author.id:
+        if message.author.id in system.ATSUI:
             return True
         else:
             return False
