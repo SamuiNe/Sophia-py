@@ -63,7 +63,7 @@ async def command_help(system, sophia, message):
             'Question commands (starts with `' + system.prefix_question + '`)\n' +
             '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`\n\n' +
             'Information commands (starts with `' + system.prefix_information + '`)\n' +
-            '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
+            '`tunnellink`, `tunnelenable`, `tunnelmode`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
             '`hello`, `invite`, `ping` (`pong`),' + '`triggertoggle`\n\n' +
             'Trigger commands\n' +
             ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
@@ -77,7 +77,7 @@ async def command_help(system, sophia, message):
             'Question commands (starts with `' + system.prefix_question + '`)\n' +
             '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`\n\n' +
             'Information commands (starts with `' + system.prefix_information + '`)\n' +
-            '`tunnellink`, `tunnelenable`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
+            '`tunnellink`, `tunnelenable`, `tunnelmode`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
             '`hello`, `invite`, `ping` (`pong`),' + '`triggertoggle`\n' +
             '...with 14 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
@@ -139,6 +139,17 @@ async def individual_command_help(system, sophia, message):
                 'Required user permission(s): *Administrator* or *Manage Server* or *Manage Channel*.\n' +
                 'Note: Requires tunnel room manager (currently first channel in the tunnel room list).\n\n' +
                 'Toggles the current room\'s tunnel enable option.')
+
+        elif message_content == 'tunnelmode':
+            await sophia.send_message(message.channel, 'Category: Information\n' +
+                'Command format: `' + system.prefix_information + 'tunnelmode `*`option`* \n' +
+                'Required user permission(s): *Administrator* or *Manage Server* or *Manage Channel*.\n' +
+                'Available option(s):\n' +
+                '`3` or `all` - Sets the channel to both send and receive messages.\n' +
+                '`2` or `receive` - Sets the channel to only receive messages.\n' +
+                '`1` or `send` - Sets the channel to only send messages.\n' +
+                '`0` or `none` - Sets the channel to not receive nor send any messages.\n\n'
+                'Changes the current tunnel mode.')
 
         elif message_content == 'tunnelleave':
             await sophia.send_message(message.channel, 'Category: Information\n' +

@@ -371,6 +371,50 @@ async def tunnel_delete(asyncio, system, sophia, message, tunnel_info):
     else:
         await sophia.send_message(message.channel, 'This channel is currently not linked to any tunnel room.')
 
+async def tunnel_mode(system, sophia, message, tunnel_info):
+    message_qualifier = ' '
+    message_separator = message.content.find(message_qualifier, 0)
+    message_content = message.content[message_separator + 1:]
+    channel_point = await channel_find(message, tunnel_info)
+    role_permission = await permission_check(system, message)
+
+    await sophia.send_message(message.channel, str(channel_point))
+    await sophia.send_message(message.channel, str(message_content))
+
+    if channel_point != -1:
+        if role_permission:
+            if message_content == '3' or message_content == 'all':
+                tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
+                    tunnel_info.channel_relation[channel_point][1]][1] = 3
+                await sophia.send_message(message.channel,
+                    'This channel room now both receive and send messages.')
+
+            elif message_content == '2' or message_content == 'receive':
+                tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
+                    tunnel_info.channel_relation[channel_point][1]][1] = 2
+                await sophia.send_message(message.channel,
+                    'This channel room now only receives messages.')
+
+            elif message_content == '1' or message_content == 'send':
+                tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
+                    tunnel_info.channel_relation[channel_point][1]][1] = 1
+                await sophia.send_message(message.channel,
+                    'This channel room now only sends messages.')
+
+            elif message_content == '0' or message_content == 'none':
+                tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
+                    tunnel_info.channel_relation[channel_point][1]][1] = 0
+                await sophia.send_message(message.channel,
+                    'This channel room now does not receive nor send any messages.')
+
+            else:
+                await sophia.send_message(message.channel, 'Failed to change tunnel mode due to invalid option.')
+        else:
+            await sophia.send_message(message.channel, 'Unable to change tunnel mode since ' +
+                    'you did not have sufficient role permission.')
+    else:
+        await sophia.send_message(message.channel, 'This channel is currently not linked to any tunnel room.')
+
 async def channel_find(message, tunnel_info):
     channel_max = len(tunnel_info.channel_relation)
     channel_loop = 0

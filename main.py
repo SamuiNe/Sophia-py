@@ -21,7 +21,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [[[True, False, 'Global Chat', '']]])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.1.10'
+__version__ = '0.2.0'
 
 
 @sophia.event
@@ -104,6 +104,9 @@ async def on_message(message):
 
                     elif message_low.startswith(System.prefix_information + 'tunnelenable'):
                         await chat_tunnel.tunnel_enable(System, sophia, message, message_low, TunnelInfo)
+
+                    elif message_low.startswith(System.prefix_information + 'tunnelmode'):
+                        await chat_tunnel.tunnel_mode(System, sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_information + 'tunnelcreate'):
                         await chat_tunnel.tunnel_create(discord, System, sophia, message, TunnelInfo)
@@ -216,14 +219,23 @@ async def on_message(message):
                     if channel_point != -1:
                         loop_max = len(TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])])
                         loop_count = 1
+                        send_allowed = True
 
-                        while loop_count != loop_max:
-                            if loop_count != TunnelInfo.channel_relation[channel_point][1]:
-                                await sophia.send_message(TunnelInfo.tunnel_receive[
-                                        int(TunnelInfo.channel_relation[channel_point][2])][loop_count][0],
-                                        str(message.server) + ' / ' + str(message.channel) + '\n' +
-                                        '>> ' + str(message.author) + ' - ' + str(message.content))
-                            loop_count += 1
+                        if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][
+                                TunnelInfo.channel_relation[channel_point][1]][1] != 0 and \
+                                TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][
+                                TunnelInfo.channel_relation[channel_point][1]][1] != 2:
+                            while loop_count != loop_max and send_allowed:
+                                if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][
+                                        loop_count][1] >= 2:
+                                    # if :
+                                    #   loop_count = TunnelInfo.channel_relation[channel_point][1]
+                                    if loop_count != TunnelInfo.channel_relation[channel_point][1]:
+                                        await sophia.send_message(TunnelInfo.tunnel_receive[
+                                                int(TunnelInfo.channel_relation[channel_point][2])][loop_count][0],
+                                                str(message.server) + ' / ' + str(message.channel) + '\n' +
+                                                '>> ' + str(message.author) + ' - ' + str(message.content))
+                                loop_count += 1
 
 token = open('sophia.uwaa')
 sophia.run(token.readline())
