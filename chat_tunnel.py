@@ -378,8 +378,8 @@ async def tunnel_mode(system, sophia, message, tunnel_info):
     channel_point = await channel_find(message, tunnel_info)
     role_permission = await permission_check(system, message)
 
-    await sophia.send_message(message.channel, str(channel_point))
-    await sophia.send_message(message.channel, str(message_content))
+    # await sophia.send_message(message.channel, str(channel_point))
+    # await sophia.send_message(message.channel, str(message_content))
 
     if channel_point != -1:
         if role_permission:
