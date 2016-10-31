@@ -280,23 +280,6 @@ async def prefix_change(system, sophia, message, message_low):
 
         temp_counter += 1
         process_count += 1
-    ''' Old Code
-    if process_index[2] is not None:
-        tempqualifier = message_low[process_index[1] + 1: \
-            (process_index[2] - process_index[1]) - 2]
-
-    if process_index[3] is not None:
-        tempquestion = message_low[process_index[2] + 1: \
-            (process_index[3] - process_index[2]) - 2]
-
-    if process_index[4] is not None:
-        tempinformation = message_low[process_index[3] + 1: \
-            (process_index[4] - process_index[3]) - 2]
-
-    if process_index[5] is not None:
-        tempdebug = message_low[process_index[4] + 1: \
-            (process_index[5] - process_index[4]) - 2]
-    '''
 
     if temp_collection[exception_counter] is not None and \
             temp_collection[exception_counter + 1] is not None:
@@ -306,21 +289,12 @@ async def prefix_change(system, sophia, message, message_low):
             if temp_collection[0] not in temp_collection[exception_counter]:
                 exception_check = True
             exception_counter += 1
-    ''' Old code
-    if tempqualifier is not None and tempquestion is not None:
-        if tempquestion is not None and not tempquestion.startswith(tempqualifier):
-            exception_check = True
-
-        if tempinformation is not None and not tempinformation.startswith(tempqualifier):
-            exception_check = True
-
-        if tempdebug is not None and not tempinformation.startswith(tempqualifier):
-            exception_check = True
-    '''
 
     if exception_check:
         await sophia.send_message(message.channel, 'Prefix change failed')
-        '''await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
+        '''Debug code
+
+        await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
             ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
             str(temp_counter) + ' ' + str(exception_counter) + '\n' +
             str(exception_check) + '\n' +
@@ -341,6 +315,7 @@ async def prefix_change(system, sophia, message, message_low):
 
         await sophia.send_message(message.channel, 'Prefix change success')
         '''Debug code
+        
         await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
             ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
             str(temp_counter) + ' ' + str(exception_counter) + '\n' +

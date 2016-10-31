@@ -128,9 +128,7 @@ async def tunnel_enable(system, sophia, message, message_low, tunnel_info):
                 if role_permission:
                     if channel_id in tunnel_info.tunnel_receive[int(tunnel_id)][1][0].id:
                         if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] != '':
-                            # await sophia.send_message(message.channel, 'Tunnel password detected')
                             if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] == tunnel_password:
-                                # await sophia.send_message(message.channel, 'Tunnel password matches')
                                 await tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id)
 
                             else:
@@ -216,8 +214,9 @@ async def tunnel_information(sophia, message, tunnel_info):
     else:
         await sophia.send_message(message.channel, 'Tunnel information search failed since the tunnel ID is missing.')
 
-async def tunnel_create(system, sophia, message, tunnel_info):
+async def tunnel_create(discord, system, sophia, message, tunnel_info):
     find_qualifier = ' '
+    channel_id = message.channel.id
     message_check = [0, None]
     message_check[0] = message.content.find(find_qualifier, 0)
     message_check[1] = message.content.find(find_qualifier, message_check[0] + 1)
@@ -235,8 +234,14 @@ async def tunnel_create(system, sophia, message, tunnel_info):
 
         if tunnel_name != '':
                 tunnel_info.tunnel_receive.append([[True, False, tunnel_name, tunnel_password]])
+                tunnel_info.tunnel_receive[int(tunnel_count)].append(
+                    [discord.utils.get(message.server.channels, id=channel_id), 3])
+                append_point = len(tunnel_info.tunnel_receive[int(tunnel_count)]) - 1
+                tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_count])
+                tunnel_info.channel_linked.append(message.channel.id)
                 await sophia.send_message(message.channel, str(tunnel_name) +
-                    ' has successfully created. Your tunnel ID is ' + str(tunnel_count) + '.')
+                    ' has successfully created and linked.\n' +
+                    'Your tunnel ID is ' + str(tunnel_count) + '.')
                 await sophia.delete_message(message)
         else:
             await sophia.delete_message(message)

@@ -21,7 +21,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [[[True, False, 'Global Chat', '']]])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.1.9'
+__version__ = '0.1.10'
 
 
 @sophia.event
@@ -106,7 +106,7 @@ async def on_message(message):
                         await chat_tunnel.tunnel_enable(System, sophia, message, message_low, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_information + 'tunnelcreate'):
-                        await chat_tunnel.tunnel_create(System, sophia, message, TunnelInfo)
+                        await chat_tunnel.tunnel_create(discord, System, sophia, message, TunnelInfo)
 
                     elif message_low.startswith(System.prefix_information + 'tunnelleave'):
                         await chat_tunnel.tunnel_leave(System, sophia, message, TunnelInfo)
