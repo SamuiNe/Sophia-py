@@ -346,7 +346,7 @@ async def change_name(sophia, message):
     name_change = message.content[name_position + 1:]
     # await sophia.send_message(message.channel, str(len(username)) + username)
     await sophia.edit_profile(password='', username=name_change)
-    await sophia.send_message(message.channel, 'Bot name successfully changed')
+    await sophia.send_message(message.channel, 'Bot name has successfully changed.')
 
 async def change_avatar(sophia, message):
     find_qualifier = ' '
@@ -360,10 +360,10 @@ async def change_avatar(sophia, message):
 
     try:
         await sophia.edit_profile(password='', avatar=processed_file)
-    except:
+    except 'InvalidArgument':
         await sophia.send_message(message.channel, 'Avatar change failed due to missing or bad image file.')
-
-    await sophia.send_message(message.channel, 'Avatar Change OK')
+    else:
+        await sophia.send_message(message.channel, 'Bot avatar has successfully changed.')
 
 
 async def trigger_toggle(system, sophia, message, message_low, permission):
