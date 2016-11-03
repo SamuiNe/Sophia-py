@@ -21,7 +21,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [[[True, False, 'Global Chat', '']]])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 @sophia.event
@@ -66,7 +66,7 @@ async def on_message(message):
 
                 elif message_low == System.prefix_question + 'botversion':
                     await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-                        ', which is last updated at 2016/10/31.')
+                        ', which is last updated at 2016/11/03.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
@@ -183,6 +183,9 @@ async def on_message(message):
 
                     elif message_low.startswith(System.prefix_debug + 'changename'):
                         await bot_system.change_name(sophia, message)
+
+                    elif message_low.startswith(System.prefix_debug + 'changeavatar'):
+                        await bot_system.change_avatar(sophia, message)
 
         else:
             if message.server.id in System.trigger_exclude:
