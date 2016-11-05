@@ -3,20 +3,26 @@
 
 
 class TunnelInformations:
-    def __init__(self, channel_linked, channel_relation, tunnel_receive):
+    def __init__(self, server_ban, channel_ban, channel_linked, channel_relation, tunnel_receive):
+        self.banned_server = server_ban
+        self.banned_channel = channel_ban
         self.channel_linked = channel_linked
         self.channel_relation = channel_relation
         self.tunnel_receive = tunnel_receive
 
-async def tunnel_references(discord, message, tunnel_info, tunnel_id, channel_id):
-    tunnel_info.tunnel_receive[int(tunnel_id)].append(
-        [discord.utils.get(message.server.channels, id=channel_id), 3])
+async def tunnel_references(discord, message, tunnel_info, tunnel_password, tunnel_id, channel_id,
+        tunnel_name=None):
+    if tunnel_name is not None:
+        tunnel_info.tunnel_receive.append([[True, False, tunnel_name, tunnel_password]])
+
+    tunnel_info.tunnel_receive[int(tunnel_id)].append([discord.utils.get(message.server.channels, id=channel_id), 3])
     append_point = len(tunnel_info.tunnel_receive[int(tunnel_id)]) - 1
     tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
     tunnel_info.channel_linked.append(message.channel.id)
 
-async def tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_id, channel_id):
-    await tunnel_references(discord, message, tunnel_info, tunnel_id, channel_id)
+
+async def tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_password, tunnel_id, channel_id):
+    await tunnel_references(discord, message, tunnel_info, tunnel_password, tunnel_id, channel_id)
     await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel room ' + tunnel_id + '.')
     await sophia.delete_message(message)
 
@@ -24,9 +30,11 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
     message_qualifier = ' '
     message_index = message.content.find(message_qualifier, 0)
     message_password = message.content.find(message_qualifier, message_index + 1)
+    server_id = message.server.id
     channel_id = message.channel.id
     tunnel_password = ''
     role_permission = await permission_check(system, message)
+    usage_allowed = await ban_check(tunnel_info, server_id, channel_id)
 
     if message_password != -1:
         tunnel_id = message.content[message_index + 1: message_password]
@@ -41,14 +49,14 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
     except IndexError:
         await sophia.send_message(message.channel, 'The tunnel room you want to link does not exist.')
     else:
-        if tunnel_info.tunnel_receive[int(tunnel_id)][0][0]:
-            # await sophia.send_message(message.channel, 'Condition Level 1 pass')
+        if usage_allowed:
+            if tunnel_info.tunnel_receive[int(tunnel_id)][0][0]:
                 if role_permission:
                     if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] != '':
-                        # await sophia.send_message(message.channel, 'Condition Level 3 pass')
                         if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] == tunnel_password:
                             if channel_id not in tunnel_info.channel_linked:
-                                await tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_id, channel_id)
+                                await tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_password,
+                                        tunnel_id, channel_id)
                             else:
                                 await sophia.send_message(message.channel, 'The channel has already' +
                                     'linked to an existing tunnel.')
@@ -60,7 +68,8 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
 
                     else:
                         if channel_id not in tunnel_info.channel_linked:
-                            await tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_id, channel_id)
+                            await tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_password,
+                                    tunnel_id, channel_id)
                         else:
                             await sophia.send_message(message.channel,
                                 'The channel has already linked to an existing tunnel.')
@@ -70,8 +79,11 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
                         'since you did not have sufficient role permissions.')
                     await sophia.delete_message(message)
 
+            else:
+                await sophia.send_message(message.channel, 'The tunnel you want to link has already been deleted.')
         else:
-            await sophia.send_message(message.channel, 'The tunnel you want to link has already been deleted.')
+            await sophia.send_message(message.channel, 'Your current channel or server is banned ' +
+                'from using chat tunneling.')
 
 async def tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id):
     if tunnel_option == 'yes' or tunnel_option == '1':
@@ -189,13 +201,15 @@ async def tunnel_information(sophia, message, tunnel_info):
 
                     if loop_count != loop_limit - 1:
                         tunnel_stats += str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0]) + ' `' + \
-                            str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0].id) + '`' + '\n'
+                                str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0].id) + '` `' + \
+                                str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0].server.id) + '`\n'
 
                         loop_count += 1
 
                     else:
                         tunnel_stats += str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0]) + ' `' + \
-                            str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0].id) + '`'
+                                str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0].id) + '` `' + \
+                                str(tunnel_info.tunnel_receive[int(tunnel_id)][loop_count][0].server.id) + '`\n'
 
                         loop_count += 1
 
@@ -209,35 +223,43 @@ async def tunnel_information(sophia, message, tunnel_info):
 async def tunnel_create(discord, system, sophia, message, tunnel_info):
     find_qualifier = ' '
     channel_id = message.channel.id
+    server_id = message.server.id
     message_check = [0, None]
     message_check[0] = message.content.find(find_qualifier, 0)
     message_check[1] = message.content.find(find_qualifier, message_check[0] + 1)
     role_permission = await permission_check(system, message)
+    usage_allowed = await ban_check(tunnel_info, server_id, channel_id)
 
-    if role_permission:
-        if message_check[1] != -1:
-            tunnel_name = message.content[message_check[0] + 1:message_check[1]]
-            tunnel_password = message.content[message_check[1] + 1:]
-        else:
-            tunnel_name = message.content[message.check[0] + 1:]
-            tunnel_password = ''
+    if usage_allowed:
+        if role_permission:
+            if message_check[1] != -1:
+                tunnel_name = message.content[message_check[0] + 1:message_check[1]]
+                tunnel_password = message.content[message_check[1] + 1:]
+            else:
+                tunnel_name = message.content[message_check[0] + 1:]
+                tunnel_password = ''
 
-        tunnel_count = len(tunnel_info.tunnel_receive)
+            tunnel_count = len(tunnel_info.tunnel_receive)
 
-        if tunnel_name != '':
-                await tunnel_references(discord, message, tunnel_info, tunnel_count, channel_id)
-                await sophia.send_message(message.channel, str(tunnel_name) +
-                    ' has successfully created and linked.\n' +
-                    'Your tunnel ID is ' + str(tunnel_count) + '.')
+            if tunnel_name != '':
+                    await tunnel_references(discord, message, tunnel_info, tunnel_password, tunnel_count, channel_id,
+                        tunnel_name)
+                    await sophia.send_message(message.channel, str(tunnel_name) +
+                        ' has successfully created and linked.\n' +
+                        'Your tunnel ID is ' + str(tunnel_count) + '.')
+                    await sophia.delete_message(message)
+            else:
                 await sophia.delete_message(message)
+                await sophia.send_message(message.channel, 'Tunnel room creation failed since' +
+                    ' you did not specify a room name.')
         else:
             await sophia.delete_message(message)
-            await sophia.send_message(message.channel, 'Tunnel room creation failed since' +
-                ' you did not specify a room name.')
+            await sophia.send_message(message.channel, 'Unable to create tunnel room since ' +
+                'you do not have sufficient role permissions.')
     else:
-        await sophia.delete_message(message)
-        await sophia.send_message(message.channel, 'Unable to create tunnel room since ' +
-            'you do not have sufficient role permissions.')
+        await sophia.send_message(message.channel, 'Your current channel or server is banned ' +
+            'from using chat tunneling.')
+
 
 async def tunnel_leave_process(sophia, message, tunnel_info, channel_point):
     tunnel_id = int(tunnel_info.channel_relation[channel_point][2])
@@ -284,7 +306,7 @@ async def tunnel_delete_process(asyncio, sophia, tunnel_info, message, channel_p
     while loop_count != loop_max:
         tunnel_channel_relation.append(tunnel_info.channel_relation.index(
                 [tunnel_info.tunnel_receive[room_id][loop_count][0].id,
-                    loop_count, str(room_id)]))
+                    loop_count, room_id]))
         tunnel_channel_link.append(tunnel_info.channel_linked.index(message.channel.id))
 
         loop_count += 1
@@ -416,3 +438,9 @@ async def permission_check(system, message):
             return True
         else:
             return False
+
+async def ban_check(tunnel_info, server_id, channel_id):
+    if channel_id in tunnel_info.banned_channel or server_id in tunnel_info.banned_server:
+        return False
+    else:
+        return True

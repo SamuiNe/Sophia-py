@@ -7,6 +7,7 @@ import logging
 # other modules
 import asyncio
 import discord
+import rethinkdb
 
 # sophia modules
 import bot_system
@@ -18,10 +19,10 @@ System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['15448855159
         ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
-TunnelInfo = chat_tunnel.TunnelInformations([], [], [[[True, False, 'Global Chat', '']]])
+TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [[[True, False, 'Global Chat', '']]])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 
 @sophia.event
@@ -66,7 +67,7 @@ async def on_message(message):
 
                 elif message_low == System.prefix_question + 'botversion':
                     await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-                        ', which is last updated at 2016/11/03.')
+                        ', which is last updated at 2016/11/05.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
@@ -177,8 +178,10 @@ async def on_message(message):
                         await sophia.send_message(message.channel, 'zzz')
                         await sophia.logout()
 
-                    elif message_low == System.prefix_debug + 'selfdestruct':
-                        await sophia.send_message(message.channel, ':boom:')
+                    elif message_low == System.prefix_debug + 'explosion':
+                        await sophia.send_message(message.channel, 'explooooosion! :boom:')
+                        await asyncio.sleep(5)
+                        await sophia.send_message(message.channel, 'zzz')
                         await sophia.logout()
 
                     elif message_low.startswith(System.prefix_debug + 'changename'):
@@ -236,8 +239,9 @@ async def on_message(message):
                                     if loop_count != TunnelInfo.channel_relation[channel_point][1]:
                                         await sophia.send_message(TunnelInfo.tunnel_receive[
                                                 int(TunnelInfo.channel_relation[channel_point][2])][loop_count][0],
-                                                str(message.server) + ' / ' + str(message.channel) + '\n' +
-                                                '>> ' + str(message.author) + ' - ' + str(message.content))
+                                                str(message.server) + ' / ' + str(message.channel) + ' - ' +
+                                                str(message.author) + '\n' +
+                                                '>> ' + str(message.content))
                                 loop_count += 1
 
 token = open('sophia.uwaa')
