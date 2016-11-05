@@ -3,9 +3,10 @@
 
 
 class TunnelInformations:
-    def __init__(self, server_ban, channel_ban, channel_linked, channel_relation, tunnel_receive):
+    def __init__(self, server_ban, channel_ban, user_ban, channel_linked, channel_relation, tunnel_receive):
         self.banned_server = server_ban
         self.banned_channel = channel_ban
+        self.banned_user = user_ban
         self.channel_linked = channel_linked
         self.channel_relation = channel_relation
         self.tunnel_receive = tunnel_receive
@@ -34,7 +35,7 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
     channel_id = message.channel.id
     tunnel_password = ''
     role_permission = await permission_check(system, message)
-    usage_allowed = await ban_check(tunnel_info, server_id, channel_id)
+    usage_allowed = await ban_check(message, tunnel_info, server_id, channel_id)
 
     if message_password != -1:
         tunnel_id = message.content[message_index + 1: message_password]
@@ -228,7 +229,7 @@ async def tunnel_create(discord, system, sophia, message, tunnel_info):
     message_check[0] = message.content.find(find_qualifier, 0)
     message_check[1] = message.content.find(find_qualifier, message_check[0] + 1)
     role_permission = await permission_check(system, message)
-    usage_allowed = await ban_check(tunnel_info, server_id, channel_id)
+    usage_allowed = await ban_check(message, tunnel_info, server_id, channel_id)
 
     if usage_allowed:
         if role_permission:
@@ -439,8 +440,9 @@ async def permission_check(system, message):
         else:
             return False
 
-async def ban_check(tunnel_info, server_id, channel_id):
-    if channel_id in tunnel_info.banned_channel or server_id in tunnel_info.banned_server:
+async def ban_check(message, tunnel_info, server_id, channel_id):
+    if message.author.id in tunnel_info.banned_user or \
+            channel_id in tunnel_info.banned_channel or server_id in tunnel_info.banned_server:
         return False
     else:
         return True

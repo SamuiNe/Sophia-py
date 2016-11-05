@@ -1,8 +1,6 @@
 # coding=utf-8
 import string
 
-# TODO: Add ability to remove room
-
 
 class RoomInformations:
     """RoomInformations([String], [[String], [Int]], (String), [[String]])
