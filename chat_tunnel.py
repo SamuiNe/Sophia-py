@@ -87,12 +87,12 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
                 'from using chat tunneling.')
 
 async def tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id):
-    if tunnel_option == 'yes' or tunnel_option == '1':
+    if tunnel_option == 'enable' or tunnel_option == 'yes' or tunnel_option == '1':
         tunnel_info.tunnel_receive[int(tunnel_id)][0][1] = True
         await sophia.send_message(message.channel, 'Tunnel ' + tunnel_id + ' is now enabled.')
         await sophia.delete_message(message)
 
-    elif tunnel_option == 'no' or tunnel_option == '2':
+    elif tunnel_option == 'disable' or tunnel_option == 'no' or tunnel_option == '2':
         tunnel_info.tunnel_receive[int(tunnel_id)][0][1] = False
         await sophia.send_message(message.channel, 'Tunnel ' + tunnel_id + ' is now disabled.')
         await sophia.delete_message(message)
@@ -121,42 +121,45 @@ async def tunnel_enable(system, sophia, message, message_low, tunnel_info):
         tunnel_option = message_low[message_check[1] + 1:]
 
     # await sophia.send_message(message.channel, str(len(tunnel_password)) + tunnel_password)
+    try:
+        if tunnel_info.tunnel_receive[int(tunnel_id)] is not None:
+            if tunnel_option != '':
+                try:
+                    tunnel_info.tunnel_receive[int(tunnel_id)][1][0]
+                except IndexError:
+                    await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
+                        'there is no channel linked in the tunnel room.')
+                else:
+                    if role_permission:
+                        if channel_id in tunnel_info.tunnel_receive[int(tunnel_id)][1][0].id:
+                            if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] != '':
+                                if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] == tunnel_password:
+                                    await tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id)
 
-    if tunnel_info.tunnel_receive[int(tunnel_id)] is not None:
-        if tunnel_option != '':
-            try:
-                tunnel_info.tunnel_receive[int(tunnel_id)][1][0]
-            except IndexError:
-                await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
-                    'there is no channel linked in the tunnel room.')
-            else:
-                if role_permission:
-                    if channel_id in tunnel_info.tunnel_receive[int(tunnel_id)][1][0].id:
-                        if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] != '':
-                            if tunnel_info.tunnel_receive[int(tunnel_id)][0][3] == tunnel_password:
-                                await tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id)
+                                else:
+                                    await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
+                                        'the tunnel password you have specified is incorrect.')
 
                             else:
-                                await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
-                                    'the tunnel password you have specified is incorrect.')
+                                await tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id)
 
                         else:
-                            await tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id)
-
+                            await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
+                                'this channel is not manager of the tunnel room.')
                     else:
                         await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
-                            'this channel is not manager of the tunnel room.')
-                else:
-                    await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
-                        'you did not have sufficient role permissions.')
+                            'you did not have sufficient role permissions.')
+
+            else:
+                await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
+                    'you did not specify the tunnel option. ')
 
         else:
             await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
-                'you did not specify the tunnel option. ')
-
-    else:
-        await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
-            'tunnel you want to enable does not exist.')
+                'tunnel you want to enable does not exist.')
+    except ValueError:
+        await sophia.send_message(message.channel, 'The command format you have entered is invalid.\n' +
+            'The command format is `' + system.prefix_information + 'tunnelenable `*`room_id option room_password`*')
 
 async def tunnel_information(sophia, message, tunnel_info):
     message_qualifier = ' '

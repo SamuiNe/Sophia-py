@@ -179,8 +179,10 @@ async def on_message(message):
                         await sophia.logout()
 
                     elif message_low == System.prefix_debug + 'explosion':
-                        await sophia.send_message(message.channel, 'explooooosion! :boom:')
-                        await asyncio.sleep(5)
+                        await sophia.send_message(message.channel, 'explooooosion!')
+                        await asyncio.sleep(0.5)
+                        await sophia.send_message(message.channel, ':boom:')
+                        await asyncio.sleep(4.2)
                         await sophia.send_message(message.channel, 'zzz')
                         await sophia.logout()
 

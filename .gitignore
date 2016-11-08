@@ -138,4 +138,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 .idea
-sophia.uwaa
+
+# Bot files
+*.out
+*.png
+*.uwaa
+*.alch
