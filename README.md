@@ -4,7 +4,7 @@
 A simple chat bot for Discord
 
 ## Description
-Sophia is a Discord chat bot with capability of creating multi-tunnel rooms to help different servers and channels to talk and connect together. 
+Sophia is a Discord chat bot with capability of creating multi-tunnel rooms to help different servers and channels to talk and connect together.
 
 ## Feature(s)
 ✓ Global Chat system<br>
@@ -17,3 +17,4 @@ Sophia is a Discord chat bot with capability of creating multi-tunnel rooms to h
 ## Requirement(s)
 - discord.py library Version 0.11.0 or newer and its requirements
 - Python 3.5.2
+- rethinkdb 2.3.5

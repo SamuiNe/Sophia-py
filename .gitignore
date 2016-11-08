@@ -139,8 +139,7 @@ $RECYCLE.BIN/
 *.lnk
 .idea
 
-# Bot files
+# Sophia bot files
 *.out
 *.png
-*.uwaa
 *.alch

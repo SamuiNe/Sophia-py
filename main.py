@@ -22,17 +22,30 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
 sophia = discord.Client()
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 
 @sophia.event
 async def on_ready():
     """Triggers when the bot is starting up."""
+    print('              [][][]')
+    print('          [][]      [][]')
+    print('      [][]              [][]')
+    print('  [][]                      [][]')
+    print('[][]                          [][]')
+    print('[]  [][]                  [][]  []')
+    print('[]      [][]          [][]      []')
+    print('[]          [][]  [][]          []')
+    print('[]      [][]    []    [][]      []')
+    print('[]  [][]        []        [][]  []')
+    print('[][]            []            [][]')
+    print('  [][]          []          [][]')
+    print('      [][]      []      [][]')
+    print('          [][]  []  [][]')
+    print('              [][][]')
     print('Logged in as ' + sophia.user.name)
     print('Discord ID: ' + sophia.user.id)
-    print('------')
-    print(sophia)
-    print('Created by SamuiNe <https://github.com/SamuiNe>')
+    print('Program created by SamuiNe <https://github.com/SamuiNe>')
     System.previous_playing_message = '(´・◡・｀)'
     if System.test_mode:
         await sophia.change_presence(game=discord.Game(name='\u26A0 TEST MODE \u26A0'))
@@ -67,7 +80,7 @@ async def on_message(message):
 
                 elif message_low == System.prefix_question + 'botversion':
                     await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-                        ', which is last updated at 2016/11/05.')
+                        ', which is last updated at 2016/11/09.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
@@ -246,5 +259,5 @@ async def on_message(message):
                                                 '>> ' + str(message.content))
                                 loop_count += 1
 
-token = open('sophia.uwaa')
+token = open('sophia.alch')
 sophia.run(token.readline())
