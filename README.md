@@ -1,5 +1,3 @@
-[![Code Issues](https://www.quantifiedcode.com/api/v1/project/c332a2b270124656b3f32be388e15b63/badge.svg)](https://www.quantifiedcode.com/app/project/c332a2b270124656b3f32be388e15b63)
-
 # Sophia-py
 A simple chat bot for Discord
 

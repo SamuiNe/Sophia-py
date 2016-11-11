@@ -33,7 +33,7 @@ class SystemVariables:
         (String)
         Entries of client ID allowed for debug prefix commands.
 
-    SystemVariables.trigger_exclude
+    SystemVariables.trigger_include
         [String]
         Entries of server ID excluded from having trigger commands.
 
@@ -42,7 +42,8 @@ class SystemVariables:
         Entry of previous playing message. For playing message storage when testing mode is turned on and off."""
 
     def __init__(self, prefix_qualifier, prefix_question, prefix_information, prefix_debug, test_mode,
-            allowed_testing, atsui, trigger_exclude, previous_playing_message):
+            allowed_testing, atsui, trigger_include, previous_playing_message, forbidden_eval,
+            token_status, custom_filename_status, custom_filename_path, eval_error_message):
         self.prefix_qualifier = prefix_qualifier
         self.prefix_question = prefix_question
         self.prefix_information = prefix_information
@@ -50,12 +51,18 @@ class SystemVariables:
         self.test_mode = test_mode
         self.allowed_testing = allowed_testing
         self.ATSUI = atsui
-        self.trigger_exclude = trigger_exclude
+        self.trigger_include = trigger_include
         self.previous_playing_message = previous_playing_message
+        self.forbidden_eval = forbidden_eval
+        self.token_status = token_status
+        self.custom_filename_status = custom_filename_status
+        self.custom_filename_path = custom_filename_path
+        self.eval_error_message = eval_error_message
+        self.eval_error_length = len(eval_error_message)
 
 async def command_help(system, sophia, message):
     trigger_status = True
-    if message.server.id in system.trigger_exclude:
+    if message.server.id in system.trigger_include:
         trigger_status = False
 
     if trigger_status:
@@ -375,16 +382,16 @@ async def trigger_toggle(system, sophia, message, message_low, permission):
             option_message = message_low[option_position + 1:]
 
             if option_message == 'disable' or option_message == 'no' or option_message == '0':
-                if message.server.id in system.trigger_exclude:
+                if message.server.id in system.trigger_include:
                     await sophia.send_message(message.channel, 'The trigger command has already ' +
                         'been disabled for this server.')
                 else:
-                    system.trigger_exclude.append(message.server.id)
+                    system.trigger_include.append(message.server.id)
                     await sophia.send_message(message.channel, 'Trigger command is now disabled for this server.')
 
             elif option_message == 'enable' or option_message == 'yes' or option_message == '1':
-                if message.server.id in system.trigger_exclude:
-                    system.trigger_exclude.remove(message.server.id)
+                if message.server.id in system.trigger_include:
+                    system.trigger_include.remove(message.server.id)
                     await sophia.send_message(message.channel, 'Trigger command is now enabled for this server.')
                 else:
                     await sophia.send_message(message.channel, 'The trigger command has already ' +

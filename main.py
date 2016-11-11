@@ -16,15 +16,24 @@ import psutil
 import bot_system
 import room
 import chat_tunnel
-
 logging.basicConfig(level=logging.INFO)
-System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['154488551596228610', '164476517101993984'],
-        ('153789058059993088', '207711558866960394'), ['110373943822540800'], None)
-RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
-        [['Testing room', 'Blackjack', 'Testing', '0']])
-TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
-DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")', 'rm -rf / --nopreserveroot')
-EvalErrorString = ['ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa',
+System = bot_system.SystemVariables(
+        prefix_qualifier='>',
+        prefix_question='>?',
+        prefix_information='>!',
+        prefix_debug='>!!',
+        test_mode=False,
+        allowed_testing=['154488551596228610', '164476517101993984'],
+        atsui=('153789058059993088', '207711558866960394'),
+        trigger_include=['110373943822540800'],
+        previous_playing_message=None,
+        forbidden_eval=('rm -rf /home/*',
+            'require("child_process").exec("rm -rf /home/*")',
+            'rm -rf / --nopreserveroot'),
+        token_status=False,
+        custom_filename_status=False,
+        custom_filename_path='',
+        eval_error_message=('ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa',
         'GRAND DAD', 'b-baka!!!', '300 internal server error',
         'i-its not like I want to help you or anything!',
         'git gud', 'did you re-read the code before entering it?',
@@ -42,10 +51,12 @@ EvalErrorString = ['ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa',
         'wew lad', 'how many times are you going to do this?',
         'p-please be gentle', 'you have found a rare item!',
         'I\'ll slap you for this', 'no cookies for you today!',
-        'I\'ll revoke your programming certificate', 'again?']
-EvalErrorLength = len(EvalErrorString)
+        'I\'ll revoke your programming certificate', 'again?'))
+RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
+        [['Testing room', 'Blackjack', 'Testing', '0']])
+TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 
 @sophia.event
@@ -104,7 +115,7 @@ async def on_message(message):
 
                 elif message_low == System.prefix_question + 'botversion':
                     await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-                        ', which is last updated at 2016/11/11.')
+                        ', which is last updated at 2016/11/12.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
@@ -130,6 +141,7 @@ async def on_message(message):
                 elif message_low == System.prefix_information + 'invite':
                     await bot_system.server_invite(sophia, message)
 
+                # TODO : Ping with ms
                 elif message_low == System.prefix_information + 'ping':
                     await sophia.send_message(message.channel, 'pong!')
 
@@ -243,7 +255,7 @@ async def on_message(message):
                         await bot_system.change_avatar(sophia, message)
 
         else:
-            if message.server.id in System.trigger_exclude:
+            if message.server.id in System.trigger_include:
                 is_allowed = False
 
             if is_allowed:
@@ -296,30 +308,26 @@ async def on_message(message):
                                                 '>> ' + str(message.content))
                                 loop_count += 1
 
-token_handling = False
-custom_filename = False
-custom_filename_path = ''
-
-while token_handling is False:
+while System.token_status is False:
     try:
-        if custom_filename is False:
+        if System.custom_filename_status is False:
             token = open('sophia.alch', 'r')
         else:
-            token = open(custom_filename_path, 'r')
+            token = open(System.custom_filename_path, 'r')
         sophia.run(token.readline())
-        token_handling = True
+        System.token_status = True
 
     except IOError:
-        if custom_filename is False:
-            custom_filename = True
+        if System.custom_filename_status is False:
+            System.custom_filename_status = True
         print('Failed to find the token file.')
         print('Perhaps the token file is in other file extension?\n')
 
         print('Please enter the token filename and its file extension.')
         print('To exit out of the program, please enter -1.')
 
-        custom_filename_path = input()
+        System.custom_filename_path = input()
 
-        if custom_filename_path == '-1':
+        if System.custom_filename_path == '-1':
             print('Exiting out of the program...')
             sys.exit()
