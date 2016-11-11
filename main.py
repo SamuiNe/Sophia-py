@@ -178,12 +178,13 @@ async def on_message(message):
                         message_split = message.content[message_index + 1:]
 
                         if message_split != '' and message_index != -1:
-                            if message_split not in DangerousEval:
+                            if message_split not in System.forbidden_eval:
                                 try:
                                     message_send = eval(message_split)
                                 except BaseException:
                                     await sophia.send_message(message.channel,
-                                        EvalErrorString[random.randrange(EvalErrorLength)] + '\n' +
+                                        System.eval_error_message[random.randrange(
+                                            System.eval_error_length)] + '\n' +
                                         '```' + str(traceback.format_exc()) + '```')
                                 else:
                                     await sophia.send_message(message.channel, message_send)
