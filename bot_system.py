@@ -284,10 +284,10 @@ async def prefix_change(system, sophia, message, message_low):
 
     while process_index[process_count] is not None and process_count != 5:
         if process_count == 4:
-            temp_collection[temp_counter] = message_low[(process_index[process_count] + 1):]
+            temp_collection[temp_counter] = message_low[process_index[process_count] + 1:]
         else:
             temp_collection[temp_counter] = message_low[process_index[process_count] + 1:
-            process_index[process_count + 1]]
+                    process_index[process_count + 1]]
 
         temp_counter += 1
         process_count += 1
@@ -326,7 +326,7 @@ async def prefix_change(system, sophia, message, message_low):
 
         await sophia.send_message(message.channel, 'Prefix change success')
         '''Debug code
-        
+
         await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
             ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
             str(temp_counter) + ' ' + str(exception_counter) + '\n' +

@@ -3,11 +3,14 @@
 
 # python built-in modules
 import logging
+import traceback
+import random
+import sys
 
 # other modules
 import asyncio
 import discord
-import rethinkdb
+import psutil
 
 # sophia modules
 import bot_system
@@ -20,9 +23,29 @@ System = bot_system.SystemVariables('>', '>?', '>!', '>!!', False, ['15448855159
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
-DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")')
+DangerousEval = ('rm -rf /home/*', 'require("child_process").exec("rm -rf /home/*")', 'rm -rf / --nopreserveroot')
+EvalErrorString = ['ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa',
+        'GRAND DAD', 'b-baka!!!', '300 internal server error',
+        'i-its not like I want to help you or anything!',
+        'git gud', 'did you re-read the code before entering it?',
+        'too much php for today?', 'maybe you need some rest?',
+        'maybe this might help you?', 'some snek told me this',
+        'still better than recursive infinite loop',
+        'you\'ve messed up again?', 'try not to rely on eval too much',
+        'don\'t worry, at least you\'re improving',
+        'maybe you need to understand the code first before evaling?',
+        'zzz', ':eyes:', 'wew', '400 bad request', '406 not acceptable',
+        '418 I\'m a teapot', '451 unavailable for legal reasons',
+        'are you bored at the moment?', 'snek? snek?! snek!!!',
+        'you\'ve tried™', 'sdjkfhakjlhfskajhfkjlhf', 'what are you doing?',
+        'I am an error message fairy', 'are you having fun?',
+        'wew lad', 'how many times are you going to do this?',
+        'p-please be gentle', 'you have found a rare item!',
+        'I\'ll slap you for this', 'no cookies for you today!',
+        'I\'ll revoke your programming certificate', 'again?']
+EvalErrorLength = len(EvalErrorString)
 sophia = discord.Client()
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 
 @sophia.event
@@ -51,6 +74,7 @@ async def on_ready():
         await sophia.change_presence(game=discord.Game(name='\u26A0 TEST MODE \u26A0'))
     else:
         await sophia.change_presence(game=discord.Game(name='(´・◡・｀)'))
+
     token.close()
     print('Sophia Version ' + __version__ + ', Ready.')
 
@@ -80,7 +104,7 @@ async def on_message(message):
 
                 elif message_low == System.prefix_question + 'botversion':
                     await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-                        ', which is last updated at 2016/11/09.')
+                        ', which is last updated at 2016/11/11.')
 
                 elif message.content == System.prefix_question + 'help':
                     await bot_system.command_help(System, sophia, message)
@@ -143,14 +167,18 @@ async def on_message(message):
 
                         if message_split != '' and message_index != -1:
                             if message_split not in DangerousEval:
-                                message_send = eval(message_split)
-
-                                await sophia.send_message(message.channel, message_send)
+                                try:
+                                    message_send = eval(message_split)
+                                except BaseException:
+                                    await sophia.send_message(message.channel,
+                                        EvalErrorString[random.randrange(EvalErrorLength)] + '\n' +
+                                        '```' + str(traceback.format_exc()) + '```')
+                                else:
+                                    await sophia.send_message(message.channel, message_send)
                             else:
-                                await sophia.send_message(message.channel, 'What are you doing?! ' +
-                                    'I refuse to eval that one!')
+                                await sophia.send_message(message.channel, 'nope')
                         else:
-                            await sophia.send_message(message.channel, 'There is nothing to eval!')
+                            await sophia.send_message(message.channel, ':eyes:')
 
                     elif message_low.startswith(System.prefix_debug + 'roomcheck'):
                         await room.room_check(RoomInfo, sophia, message, message_low)
@@ -166,6 +194,15 @@ async def on_message(message):
 
                     elif message_low.startswith(System.prefix_debug + 'prefixchange'):
                         await bot_system.prefix_change(System, sophia, message, message_low)
+
+                    elif message_low == System.prefix_debug + 'mpstatus':
+                        await sophia.send_message(message.channel, 'Current MP status:\n\n' +
+                            '`Allocated` '+ str(round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) +
+                            ' (py) / ' +
+                            str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) + ' `MP` (' +
+                            str(psutil.virtual_memory().percent) + '%)\n' +
+                            '`Available` ' + str(round(psutil.virtual_memory().available / (1024 ** 2), 2)) +
+                            ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MP`')
 
                     elif message_low == System.prefix_debug + 'suspend':
                         await asyncio.sleep(5)
@@ -259,5 +296,30 @@ async def on_message(message):
                                                 '>> ' + str(message.content))
                                 loop_count += 1
 
-token = open('sophia.alch')
-sophia.run(token.readline())
+token_handling = False
+custom_filename = False
+custom_filename_path = ''
+
+while token_handling is False:
+    try:
+        if custom_filename is False:
+            token = open('sophia.alch', 'r')
+        else:
+            token = open(custom_filename_path, 'r')
+        sophia.run(token.readline())
+        token_handling = True
+
+    except IOError:
+        if custom_filename is False:
+            custom_filename = True
+        print('Failed to find the token file.')
+        print('Perhaps the token file is in other file extension?\n')
+
+        print('Please enter the token filename and its file extension.')
+        print('To exit out of the program, please enter -1.')
+
+        custom_filename_path = input()
+
+        if custom_filename_path == '-1':
+            print('Exiting out of the program...')
+            sys.exit()

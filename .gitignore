@@ -139,7 +139,13 @@ $RECYCLE.BIN/
 *.lnk
 .idea
 
+# Image files
+*.png
+
 # Sophia bot files
 *.out
-*.png
 *.alch
+*.bfal
+*.recp
+*.syth
+*.ingr

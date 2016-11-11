@@ -92,7 +92,7 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
 
             else:
                 await sophia.send_message(message.channel, 'The tunnel you want to link has already been deleted.')
-                
+
         else:
             await sophia.send_message(message.channel, 'Your current channel or server is banned ' +
                 'from using chat tunneling.')

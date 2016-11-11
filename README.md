@@ -17,4 +17,4 @@ Sophia is a Discord chat bot with capability of creating multi-tunnel rooms to h
 ## Requirement(s)
 - discord.py library Version 0.11.0 or newer and its requirements
 - Python 3.5.2
-- rethinkdb 2.3.5
+- psutil 5.0.0 or so
