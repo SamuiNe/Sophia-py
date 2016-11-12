@@ -56,7 +56,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.6'
+__version__ = '0.2.7'
 
 
 @sophia.event
@@ -80,11 +80,11 @@ async def on_ready():
     print('Logged in as ' + sophia.user.name)
     print('Discord ID: ' + sophia.user.id)
     print('Program created by SamuiNe <https://github.com/SamuiNe>')
-    System.previous_playing_message = '(´・◡・｀)'
+    System.previous_playing_message = System.prefix_question + 'help for help'
     if System.test_mode:
         await sophia.change_presence(game=discord.Game(name='\u26A0 TEST MODE \u26A0'))
     else:
-        await sophia.change_presence(game=discord.Game(name='(´・◡・｀)'))
+        await sophia.change_presence(game=discord.Game(name=System.previous_playing_message))
 
     token.close()
     print('Sophia Version ' + __version__ + ', Ready.')
@@ -130,7 +130,15 @@ async def on_message(message):
                     await chat_tunnel.tunnel_information(sophia, message, TunnelInfo)
 
             elif message.content.startswith(System.prefix_information):
-                if message.content == System.prefix_information + 'hello':
+                if message_low == System.prefix_information + 'ping':
+                    ping_message = 'pong!'
+                    await bot_system.detailed_ping(System, sophia, message, ping_message)
+
+                elif message_low == System.prefix_information + 'pong':
+                    ping_message = 'ping!'
+                    await bot_system.detailed_ping(System, sophia, message, ping_message)
+
+                elif message.content == System.prefix_information + 'hello':
                     mess_len = len(str(message.author))
                     await sophia.send_message(message.channel, 'Hello ' + str(message.author)[:mess_len - 5] + ' o/')
 
@@ -140,14 +148,6 @@ async def on_message(message):
 
                 elif message_low == System.prefix_information + 'invite':
                     await bot_system.server_invite(sophia, message)
-
-                elif message_low == System.prefix_information + 'ping':
-                    ping_message = 'pong!'
-                    await bot_system.detailed_ping(System, sophia, message, ping_message)
-
-                elif message_low == System.prefix_information + 'pong':
-                    ping_message = 'ping!'
-                    await bot_system.detailed_ping(System, sophia, message, ping_message)
 
                 elif message_low.startswith(System.prefix_information + 'tunnel'):
                     if message_low.startswith(System.prefix_information + 'tunnellink'):
@@ -185,7 +185,7 @@ async def on_message(message):
                                 except BaseException:
                                     await sophia.send_message(message.channel,
                                         System.eval_error_message[random.randrange(
-                                            System.eval_error_length)] + '\n' +
+                                                System.eval_error_length)] + '\n' +
                                         '```' + str(traceback.format_exc()) + '```')
                                 else:
                                     await sophia.send_message(message.channel, message_send)
@@ -226,7 +226,7 @@ async def on_message(message):
                         game_message = str(message.content)[14:]
                         System.previous_playing_message = game_message
 
-                        await sophia.change_status(game=discord.Game(name=game_message), idle=False)
+                        await sophia.change_presence(game=discord.Game(name=game_message))
                         await sophia.send_message(message.channel, 'Playing message has successfully updated.')
 
                     elif message.content.startswith(System.prefix_debug + 'testmode'):
@@ -309,6 +309,7 @@ async def on_message(message):
                                                 str(message.author) + '\n' +
                                                 '>> ' + str(message.content))
                                 loop_count += 1
+
     elif message.author.id == sophia.user.id and len(System.ping_information) != 0:
         if message.channel.id == System.ping_information[0][0]:
             message_content = message.content

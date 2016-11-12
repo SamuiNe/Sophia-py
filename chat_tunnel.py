@@ -27,7 +27,7 @@ async def tunnel_references(discord, message, tunnel_info, tunnel_password, tunn
 
 async def tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_password, tunnel_id, channel_id):
     await tunnel_references(discord, message, tunnel_info, tunnel_password, tunnel_id, channel_id)
-    await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel room ' + tunnel_id + '.')
+    await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel room ' + str(tunnel_id) + '.')
     await sophia.delete_message(message)
 
 
@@ -44,17 +44,22 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
     if message_password != -1:
         tunnel_password = message.content[message_password + 1:]
 
-    # await sophia.send_message(message.channel, str(len(tunnel_id)) + ' ' + tunnel_id)
+    # await sophia.send_message(message.channel, str(message.content[message_index + 1: message_password]) + ' ' +
+    #                    str(len(message.content[message_index + 1: message_password])))
 
     try:
-        tunnel_id = int(message.content[message_index + 1:])
-        tunnel_settings = tunnel_info.tunnel_receive[tunnel_id][0]
+        if message_password != -1:
+            tunnel_id = int(message.content[message_index + 1: message_password])
+        else:
+            tunnel_id = int(message.content[message_index + 1:])
 
-    except IndexError:
-        await sophia.send_message(message.channel, 'The tunnel room you want to link does not exist.')
+        tunnel_settings = tunnel_info.tunnel_receive[tunnel_id][0]
 
     except ValueError:
         await sophia.send_message(message.channel, 'The tunnel room you want to link is invalid.')
+
+    except IndexError:
+        await sophia.send_message(message.channel, 'The tunnel room you want to link does not exist.')
 
     else:
         if usage_allowed:
@@ -101,12 +106,12 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
 async def tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tunnel_id):
     if tunnel_option == 'enable' or tunnel_option == 'yes' or tunnel_option == '1':
         tunnel_info.tunnel_receive[int(tunnel_id)][0][1] = True
-        await sophia.send_message(message.channel, 'Tunnel ' + tunnel_id + ' is now enabled.')
+        await sophia.send_message(message.channel, 'Tunnel ' + str(tunnel_id) + ' is now enabled.')
         await sophia.delete_message(message)
 
     elif tunnel_option == 'disable' or tunnel_option == 'no' or tunnel_option == '2':
         tunnel_info.tunnel_receive[int(tunnel_id)][0][1] = False
-        await sophia.send_message(message.channel, 'Tunnel ' + tunnel_id + ' is now disabled.')
+        await sophia.send_message(message.channel, 'Tunnel ' + str(tunnel_id) + ' is now disabled.')
         await sophia.delete_message(message)
 
     else:
@@ -140,9 +145,11 @@ async def tunnel_enable(system, sophia, message, message_low, tunnel_info):
     except ValueError:
         await sophia.send_message(message.channel, 'The command format you have entered is invalid.\n' +
             'The command format is `' + system.prefix_information + 'tunnelenable `*`tunnel_id option room_password`*')
+
     except IndexError:
         await sophia.send_message(message.channel, 'Unable to change tunnel status since ' +
             'tunnel you want to enable does not exist.')
+
     else:
         if tunnel_option != '':
             if role_permission:
@@ -191,7 +198,6 @@ async def tunnel_information(sophia, message, tunnel_info):
 
         else:
             loop_count = 1
-            current_tunnel_loop = current_tunnel[loop_count]
             loop_limit = len(current_tunnel)
 
             if current_tunnel[0][0]:
@@ -214,19 +220,19 @@ async def tunnel_information(sophia, message, tunnel_info):
                 # await sophia.send_message(message.channel, str(loop_count) + ' ' + str(loop_limit))
 
                 while loop_count != loop_limit:
-                    tunnel_stats += str(tunnel_type_indicator[current_tunnel_loop[1]]) + ' '
+                    tunnel_stats += str(tunnel_type_indicator[current_tunnel[loop_count][1]]) + ' '
 
                     if loop_count != loop_limit - 1:
-                        tunnel_stats += str(current_tunnel_loop[0]) + ' `' + \
-                                str(current_tunnel_loop[0].id) + '` `' + \
-                                str(current_tunnel_loop[0].server.id) + '`\n'
+                        tunnel_stats += str(current_tunnel[loop_count][0]) + ' `' + \
+                                str(current_tunnel[loop_count][0].id) + '` `' + \
+                                str(current_tunnel[loop_count][0].server.id) + '`\n'
 
                         loop_count += 1
 
                     else:
-                        tunnel_stats += str(current_tunnel_loop[0]) + ' `' + \
-                                str(current_tunnel_loop[0].id) + '` `' + \
-                                str(current_tunnel_loop[0].server.id) + '`\n'
+                        tunnel_stats += str(current_tunnel[loop_count][0]) + ' `' + \
+                                str(current_tunnel[loop_count][0].id) + '` `' + \
+                                str(current_tunnel[loop_count][0].server.id) + '`\n'
 
                         loop_count += 1
 

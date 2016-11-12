@@ -72,7 +72,7 @@ async def command_help(system, sophia, message):
             '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`\n\n' +
             'Information commands (starts with `' + system.prefix_information + '`)\n' +
             '`tunnellink`, `tunnelenable`, `tunnelmode`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
-            '`hello`, `invite`, `ping` (`pong`),' + '`triggertoggle`\n\n' +
+            '`hello`, `invite`, `ping` (`pong`), `triggertoggle`\n\n' +
             'Trigger commands\n' +
             ':coffee:, :tea:, `cawfee`, `gween tea`, ' +
             '`\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b`, ' +
@@ -86,7 +86,7 @@ async def command_help(system, sophia, message):
             '`about`, `help`, `command`, `botversion`, `infocheck`, `tunnelcheck`\n\n' +
             'Information commands (starts with `' + system.prefix_information + '`)\n' +
             '`tunnellink`, `tunnelenable`, `tunnelmode`, `tunnelleave`, `tunnelcreate`, `tunneldelete`\n'+
-            '`hello`, `invite`, `ping` (`pong`),' + '`triggertoggle`\n' +
+            '`ping` (`pong`), `hello`, `invite`, `triggertoggle`\n' +
             '...with 14 secret commands! \n\n' +
             'For information of individual commands, please enter `' + system.prefix_question +
             'command `*`command`*.')
