@@ -56,7 +56,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progr
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.5'
+__version__ = '0.2.6'
 
 
 @sophia.event
@@ -141,12 +141,13 @@ async def on_message(message):
                 elif message_low == System.prefix_information + 'invite':
                     await bot_system.server_invite(sophia, message)
 
-                # TODO : Ping with ms
                 elif message_low == System.prefix_information + 'ping':
-                    await sophia.send_message(message.channel, 'pong!')
+                    ping_message = 'pong!'
+                    await bot_system.detailed_ping(System, sophia, message, ping_message)
 
                 elif message_low == System.prefix_information + 'pong':
-                    await sophia.send_message(message.channel, 'ping!')
+                    ping_message = 'ping!'
+                    await bot_system.detailed_ping(System, sophia, message, ping_message)
 
                 elif message_low.startswith(System.prefix_information + 'tunnel'):
                     if message_low.startswith(System.prefix_information + 'tunnellink'):
@@ -308,6 +309,21 @@ async def on_message(message):
                                                 str(message.author) + '\n' +
                                                 '>> ' + str(message.content))
                                 loop_count += 1
+    elif message.author.id == sophia.user.id and len(System.ping_information) != 0:
+        if message.channel.id == System.ping_information[0][0]:
+            message_content = message.content
+            timestamp_value = message.timestamp.hour * 3600000 + \
+                    message.timestamp.minute * 60000 + \
+                    message.timestamp.second * 1000 + \
+                    int(message.timestamp.microsecond / 1000)
+
+            timestamp_difference = timestamp_value - System.ping_information[0][1]
+            if timestamp_difference < 0:
+                timestamp_difference -= 86400000
+
+            await sophia.edit_message(message, message_content + ' ' + str(timestamp_difference) + '`ms`')
+            del System.ping_information[0]
+
 
 while System.token_status is False:
     try:

@@ -59,6 +59,7 @@ class SystemVariables:
         self.custom_filename_path = custom_filename_path
         self.eval_error_message = eval_error_message
         self.eval_error_length = len(eval_error_message)
+        self.ping_information = []
 
 async def command_help(system, sophia, message):
     trigger_status = True
@@ -230,6 +231,7 @@ async def individual_command_help(system, sophia, message):
             'not specified.\n' +
             'Usage: `' + system.prefix_question + 'command `*`command`*')
 
+
 async def info_check(sophia, message):
     await sophia.send_message(message.channel, '`Author`: ' + str(message.author) +
         ' `' + str(message.author.id) + '`\n' +
@@ -238,12 +240,25 @@ async def info_check(sophia, message):
         '`Channel`: ' + str(message.channel) + ' `' + str(message.channel.id) + '`\n' +
         '`Server`: ' + str(message.server.name) + ' `' + str(message.server.id) + '`')
 
+
 async def server_invite(sophia, message):
     await sophia.send_message(message.channel,
         'You can take me to your discord server by clicking the link below.' + '\n' +
         'https://discordapp.com/oauth2/authorize?client_id=229134725569183745&scope=bot&permissions=0' + '\n\n' +
         'Interested in joining my discord guild? You can visit it by using the invite link below!' + '\n' +
         'https://discord.gg/SpTWKDd')
+
+
+async def detailed_ping(system, sophia, message, ping_message):
+    channel_id = message.channel.id
+    timestamp_value = message.timestamp.hour * 3600000 + \
+            message.timestamp.minute * 60000 + \
+            message.timestamp.second * 1000 + \
+            int(message.timestamp.microsecond / 1000)
+
+    system.ping_information.append((channel_id, timestamp_value))
+    await sophia.send_message(message.channel, ping_message)
+
 
 async def testing_mode(system, discord, sophia, message, message_low):
     message_qualifier = ' '
