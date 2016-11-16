@@ -186,7 +186,7 @@ async def on_message(message):
                                     await sophia.send_message(message.channel,
                                         System.eval_error_message[random.randrange(
                                                 System.eval_error_length)] + '\n' +
-                                        '```py\n' + str(traceback.format_exc()) + '```')
+                                        '```py\n' + traceback.format_exc() + '```')
                                 else:
                                     await sophia.send_message(message.channel, message_send)
                             else:
