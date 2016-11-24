@@ -51,7 +51,8 @@ System = bot_system.SystemVariables(
         'p-please be gentle', 'you have found a rare item!',
         'I\'ll slap you for this', 'no cookies for you today!',
         'I\'ll revoke your programming certificate', 'again?'))
-RoomInfo = room.RoomInformations([], [['Blackjack'], [6]], ('Waiting', 'In Progress', 'Deleted'),
+RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
+        ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()

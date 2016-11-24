@@ -2,12 +2,14 @@
 """Text encoding UTF-8"""
 
 class SystemVariables:
-    """SystemVariables(String, String, String, String, Boolean, [String], (String), [String], String)
+    """SystemVariables(String, String, String, String, Boolean, [String],
+    (String), [String], String)
     Class for constructing required system variables for the bot.
 
     SystemVariables.prefix_qualifier
         String
-        Command qualifier. Intended to be the first character of all command prefix.
+        Command qualifier.
+        Intended to be the first character of all command prefix.
 
     SystemVariables.prefix_question
         String
@@ -39,11 +41,13 @@ class SystemVariables:
 
     SystemVariables.previous_playing_message
         String
-        Entry of previous playing message. For playing message storage when testing mode is turned on and off."""
+        Entry of previous playing message.
+        For playing message storage when testing mode is turned on and off."""
 
-    def __init__(self, prefix_qualifier, prefix_question, prefix_information, prefix_debug, test_mode,
-            allowed_testing, atsui, trigger_include, previous_playing_message, forbidden_eval,
-            token_status, custom_filename_status, custom_filename_path, eval_error_message):
+    def __init__(self, prefix_qualifier, prefix_question, prefix_information,
+            prefix_debug, test_mode, allowed_testing, atsui, trigger_include,
+            previous_playing_message, forbidden_eval, token_status,
+            custom_filename_status, custom_filename_path, eval_error_message):
         self.prefix_qualifier = prefix_qualifier
         self.prefix_question = prefix_question
         self.prefix_information = prefix_information
@@ -325,20 +329,6 @@ async def prefix_change(system, sophia, message, message_low):
 
     if exception_check:
         await sophia.send_message(message.channel, 'Prefix change failed')
-        '''Debug code
-
-        await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
-            ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
-            str(temp_counter) + ' ' + str(exception_counter) + '\n' +
-            str(exception_check) + '\n' +
-            '> ' + str(process_index[0]) + ' ' + str(process_index[1]) + ' ' +
-            str(process_index[2]) + ' ' + str(process_index[3]) + ' ' +
-            str(process_index[4]) + ' ' + str(process_index[5]) + '\n' +
-            '>> ' + str(temp_collection[0]) + ' ' + str(temp_collection[1]) + ' ' +
-            str(temp_collection[2]) + ' ' + str(temp_collection[3]) + '\n' +
-            'L> ' + str(len(str(temp_collection[0]))) + ', ' + str(len(str(temp_collection[1]))) +
-            ', ' + str(len(str(temp_collection[2]))) + ', ' + str(len(str(temp_collection[3]))))
-        '''
 
     else:
         system.prefix_qualifier = temp_collection[0]

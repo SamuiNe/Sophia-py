@@ -16,9 +16,9 @@ async def debug_process(sys, asyncio, discord, bot_system, room, system, sophia,
                     message_send = eval(message_split)
                 except BaseException:
                     await sophia.send_message(message.channel,
-                                        system.eval_error_message[random.randrange(
-                                            system.eval_error_length)] + '\n' +
-                                        '```py\n' + traceback.format_exc() + '```')
+                        system.eval_error_message[random.randrange(
+                        system.eval_error_length)] + '\n' +
+                        '```py\n' + traceback.format_exc() + '```')
                 else:
                     await sophia.send_message(message.channel, message_send)
             else:
@@ -43,12 +43,11 @@ async def debug_process(sys, asyncio, discord, bot_system, room, system, sophia,
 
     elif message_low == system.prefix_debug + 'mpstatus':
         await sophia.send_message(message.channel, 'Current MP status:\n\n' +
-                            '`Allocated` ' + str(round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) +
-                            ' `(py)` / ' +
-                            str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) + ' `MP` (' +
-                            str(psutil.virtual_memory().percent) + '%)\n' +
-                            '`Available` ' + str(round(psutil.virtual_memory().available / (1024 ** 2), 2)) +
-                            ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MP`')
+            '`Allocated` ' + str(round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
+            str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) + ' `MP` (' +
+            str(psutil.virtual_memory().percent) + '%)\n' +
+            '`Available` ' + str(round(psutil.virtual_memory().available / (1024 ** 2), 2)) +
+            ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MP`')
 
     elif message_low == system.prefix_debug + 'suspend':
         await asyncio.sleep(5)
