@@ -263,6 +263,21 @@ async def detailed_ping(system, sophia, message, ping_message):
     system.ping_information.append((channel_id, timestamp_value))
     await sophia.send_message(message.channel, ping_message)
 
+async def detailed_ping_edit(system, sophia, message):
+    if message.channel.id == system.ping_information[0][0]:
+        message_content = message.content
+        timestamp_value = message.timestamp.hour * 3600000 + \
+                          message.timestamp.minute * 60000 + \
+                          message.timestamp.second * 1000 + \
+                          int(message.timestamp.microsecond / 1000)
+
+        timestamp_difference = timestamp_value - system.ping_information[0][1]
+        if timestamp_difference < 0:
+            timestamp_difference -= 86400000
+
+        await sophia.edit_message(message, message_content + ' ' + str(timestamp_difference) + '`ms`')
+        del system.ping_information[0]
+
 
 async def testing_mode(system, discord, sophia, message, message_low):
     message_qualifier = ' '

@@ -17,6 +17,7 @@ import commands
 import bot_system
 import room
 import chat_tunnel
+
 logging.basicConfig(level=logging.INFO)
 System = bot_system.SystemVariables(
         prefix_qualifier='>',
@@ -124,68 +125,13 @@ async def on_message(message):
                     System, sophia, message, message_low, RoomInfo)
 
         else:
-            if message.server.id not in System.trigger_exclude:
-                if message.content == '\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029':
-                    await sophia.send_message(message.channel, '(╯°□°）╯︵ ┻━┻')
-
-                elif message.content == '\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b':
-                    await sophia.send_message(message.channel, '┬─┬﻿ ノ( ゜-゜ノ)')
-
-                elif message_low == 'cawfee':
-                    await asyncio.sleep(1)
-                    await sophia.send_message(message.channel, 'gween tea')
-
-                elif message_low == 'gween tea':
-                    await asyncio.sleep(1)
-                    await sophia.send_message(message.channel, 'cawfee')
-
-                elif message.content == '\u2615':
-                    await asyncio.sleep(1)
-                    await sophia.send_message(message.channel, ':tea:')
-
-                elif message.content == '\U0001F375':
-                    await asyncio.sleep(1)
-                    await sophia.send_message(message.channel, ':coffee:')
+            await commands.trigger_commands(asyncio, sophia, message, message_low)
 
             if message.channel.id in TunnelInfo.channel_linked:
-                channel_point = await chat_tunnel.channel_find(message, TunnelInfo)
-
-                # await sophia.send_message(message.channel, str(channel_point))
-                if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][0][1]:
-                    if channel_point != -1:
-                        loop_max = len(TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])])
-                        loop_count = 1
-                        send_allowed = True
-
-                        if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][
-                                TunnelInfo.channel_relation[channel_point][1]][1] != 0 and \
-                                TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][
-                                TunnelInfo.channel_relation[channel_point][1]][1] != 2:
-                            while loop_count != loop_max and send_allowed:
-                                if TunnelInfo.tunnel_receive[int(TunnelInfo.channel_relation[channel_point][2])][
-                                        loop_count][1] >= 2:
-                                    if loop_count != TunnelInfo.channel_relation[channel_point][1]:
-                                        await sophia.send_message(TunnelInfo.tunnel_receive[
-                                            int(TunnelInfo.channel_relation[channel_point][2])][loop_count][0],
-                                            str(message.server) + ' / ' + str(message.channel) + ' - ' +
-                                            str(message.author) + '\n' +
-                                            '>> ' + str(message.content))
-                                loop_count += 1
+                await chat_tunnel.chat_tunnel_process(sophia, message, TunnelInfo)
 
     elif message.author.id == sophia.user.id and len(System.ping_information) != 0:
-        if message.channel.id == System.ping_information[0][0]:
-            message_content = message.content
-            timestamp_value = message.timestamp.hour * 3600000 + \
-                    message.timestamp.minute * 60000 + \
-                    message.timestamp.second * 1000 + \
-                    int(message.timestamp.microsecond / 1000)
-
-            timestamp_difference = timestamp_value - System.ping_information[0][1]
-            if timestamp_difference < 0:
-                timestamp_difference -= 86400000
-
-            await sophia.edit_message(message, message_content + ' ' + str(timestamp_difference) + '`ms`')
-            del System.ping_information[0]
+        await bot_system.detailed_ping_edit(System, sophia, message)
 
 
 while System.token_status is False:

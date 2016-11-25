@@ -151,3 +151,25 @@ async def debug_process(sys, random, traceback, asyncio, discord, psutil, bot_sy
     elif message_low.startswith(system.prefix_debug + 'changeavatar'):
         await bot_system.change_avatar(sophia, message)
 
+async def trigger_commands(asyncio, sophia, message, message_low):
+    if message.content == '\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029':
+        await sophia.send_message(message.channel, '(╯°□°）╯︵ ┻━┻')
+
+    elif message.content == '\u0028\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b':
+        await sophia.send_message(message.channel, '┬─┬﻿ ノ( ゜-゜ノ)')
+
+    elif message_low == 'cawfee':
+        await asyncio.sleep(1)
+        await sophia.send_message(message.channel, 'gween tea')
+
+    elif message_low == 'gween tea':
+        await asyncio.sleep(1)
+        await sophia.send_message(message.channel, 'cawfee')
+
+    elif message.content == '\u2615':
+        await asyncio.sleep(1)
+        await sophia.send_message(message.channel, ':tea:')
+
+    elif message.content == '\U0001F375':
+        await asyncio.sleep(1)
+        await sophia.send_message(message.channel, ':coffee:')

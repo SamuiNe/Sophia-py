@@ -446,7 +446,7 @@ async def tunnel_mode(system, sophia, message, tunnel_info):
                 await sophia.send_message(message.channel, 'Failed to change tunnel mode due to invalid option.')
         else:
             await sophia.send_message(message.channel, 'Unable to change tunnel mode since ' +
-                    'you did not have sufficient role permission.')
+                'you did not have sufficient role permission.')
     else:
         await sophia.send_message(message.channel, 'This channel is currently not linked to any tunnel room.')
 
@@ -487,3 +487,29 @@ async def ban_check(message, tunnel_info, server_id, channel_id):
 
     else:
         return True
+
+async def chat_tunnel_process(sophia, message, tunnel_info):
+    channel_point = await channel_find(message, tunnel_info)
+
+    # await sophia.send_message(message.channel, str(channel_point))
+    if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][0][1]:
+        if channel_point != -1:
+            loop_max = len(tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])])
+            loop_count = 1
+            send_allowed = True
+
+            if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
+                    tunnel_info.channel_relation[channel_point][1]][1] != 0 and \
+                    tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
+                    tunnel_info.channel_relation[channel_point][1]][1] != 2:
+                while loop_count != loop_max and send_allowed:
+                    if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
+                            loop_count][1] >= 2:
+                        if loop_count != tunnel_info.channel_relation[channel_point][1]:
+                            await sophia.send_message(tunnel_info.tunnel_receive[
+                                int(tunnel_info.channel_relation[channel_point][2])][
+                                loop_count][0],
+                                str(message.server) + ' / ' + str(message.channel) + ' - ' +
+                                str(message.author) + '\n' +
+                                '>> ' + str(message.content))
+                loop_count += 1
