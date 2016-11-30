@@ -7,7 +7,7 @@ async def question_process(bot_system, chat_tunnel, system, sophia, message, mes
 
     elif message_low == system.prefix_question + 'botversion':
         await sophia.send_message(message.channel, 'My current version is ' + version +
-            ', which is last updated at 2016/11/25.')
+            ', which is last updated at 2016/11/30.')
 
     elif message.content == system.prefix_question + 'help':
         await bot_system.command_help(system, sophia, message)
@@ -67,28 +67,8 @@ async def information_process(asyncio, discord, bot_system, chat_tunnel, system,
 
 async def debug_process(sys, random, traceback, asyncio, discord, psutil, bot_system, room, system, sophia, message,
         message_low, room_info):
-    if message_low.startswith(system.prefix_debug + 'eval'):
-        message_qualifier = ' '
-        message_index = message.content.find(message_qualifier, 0)
-        message_split = message.content[message_index + 1:]
 
-        if message_split != '' and message_index != -1:
-            if message_split not in system.forbidden_eval:
-                try:
-                    message_send = eval(message_split)
-                except BaseException:
-                    await sophia.send_message(message.channel,
-                        system.eval_error_message[random.randrange(
-                        system.eval_error_length)] + '\n' +
-                        '```py\n' + traceback.format_exc() + '```')
-                else:
-                    await sophia.send_message(message.channel, message_send)
-            else:
-                await sophia.send_message(message.channel, 'nope')
-        else:
-            await sophia.send_message(message.channel, ':eyes:')
-
-    elif message_low.startswith(system.prefix_debug + 'roomcheck'):
+    if message_low.startswith(system.prefix_debug + 'roomcheck'):
         await room.room_check(room_info, sophia, message, message_low)
 
     elif message_low.startswith(system.prefix_debug + 'roomcreate'):
@@ -105,12 +85,10 @@ async def debug_process(sys, random, traceback, asyncio, discord, psutil, bot_sy
 
     elif message_low == system.prefix_debug + 'mpstatus':
         await sophia.send_message(message.channel, 'Current MP status:\n\n' +
-            '`Allocated` ' + str(
-            round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
-            str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) + ' `MP` (' +
-            str(psutil.virtual_memory().percent) + '%)\n' +
-            '`Available` ' + str(
-            round(psutil.virtual_memory().available / (1024 ** 2), 2)) +
+            '`Allocated` ' + str( round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
+            str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) +
+            ' `MP` (' + str(psutil.virtual_memory().percent) + '%)\n' +
+            '`Available` ' + str( round(psutil.virtual_memory().available / (1024 ** 2), 2)) +
             ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MP`')
 
     elif message_low == system.prefix_debug + 'suspend':
@@ -150,6 +128,10 @@ async def debug_process(sys, random, traceback, asyncio, discord, psutil, bot_sy
 
     elif message_low.startswith(system.prefix_debug + 'changeavatar'):
         await bot_system.change_avatar(sophia, message)
+
+    elif message_low.startswith(system.prefix_debug + 'leaveserver'):
+        await sophia.send_message(message.channel, 'Server leave success')
+        await sophia.leave_server(message.server)
 
 async def trigger_commands(asyncio, sophia, message, message_low):
     if message.content == '\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029':

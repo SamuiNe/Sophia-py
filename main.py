@@ -36,30 +36,30 @@ System = bot_system.SystemVariables(
         custom_filename_status=False,
         custom_filename_path='',
         eval_error_message=('ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa',
-        'GRAND DAD', 'b-baka!!!', '300 internal server error',
-        'i-its not like I want to help you or anything!',
-        'git gud', 'did you re-read the code before entering it?',
-        'too much php for today?', 'maybe you need some rest?',
-        'maybe this might help you?', 'some snek told me this',
-        'still better than recursive infinite loop',
-        'you\'ve messed up again?', 'try not to rely on eval too much',
-        'don\'t worry, at least you\'re improving',
-        'maybe you need to understand the code first before evaling?',
-        'zzz', ':eyes:', 'wew', '400 bad request', '406 not acceptable',
-        '418 I\'m a teapot', '451 unavailable for legal reasons',
-        'are you bored at the moment?', 'snek? snek?! snek!!!',
-        'you\'ve tried™', 'sdjkfhakjlhfskajhfkjlhf', 'what are you doing?',
-        'I am an error message fairy', 'are you having fun?',
-        'wew lad', 'how many times are you going to do this?',
-        'p-please be gentle', 'you have found a rare item!',
-        'I\'ll slap you for this', 'no cookies for you today!',
-        'I\'ll revoke your programming certificate', 'again?'))
+            'GRAND DAD', 'b-baka!!!', '300 internal server error',
+            'i-its not like I want to help you or anything!',
+            'git gud', 'did you re-read the code before entering it?',
+            'too much php for today?', 'maybe you need some rest?',
+            'maybe this might help you?', 'some snek told me this',
+            'still better than recursive infinite loop',
+            'you\'ve messed up again?', 'try not to rely on eval too much',
+            'don\'t worry, at least you\'re improving',
+            'maybe you need to understand the code first before evaling?',
+            'zzz', ':eyes:', 'wew', '400 bad request', '406 not acceptable',
+            '418 I\'m a teapot', '451 unavailable for legal reasons',
+            'are you bored at the moment?', 'snek? snek?! snek!!!',
+            'you\'ve tried™', 'sdjkfhakjlhfskajhfkjlhf', 'what are you doing?',
+            'I am an error message fairy', 'are you having fun?',
+            'wew lad', 'how many times are you going to do this?',
+            'p-please be gentle', 'you have found a rare item!',
+            'I\'ll slap you for this', 'no cookies for you today!',
+            'I\'ll revoke your programming certificate', 'again?'))
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
         ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.9'
+__version__ = '0.2.10'
 
 
 @sophia.event
@@ -121,17 +121,50 @@ async def on_message(message):
                     message_low, TunnelInfo)
 
             elif message.content.startswith(System.prefix_debug):
-                await commands.debug_process(sys, random, traceback, asyncio, discord, psutil, bot_system, room,
-                    System, sophia, message, message_low, RoomInfo)
+                if message_low.startswith(System.prefix_debug + 'eval'):
+                    message_qualifier = ' '
+                    message_index = message.content.find(message_qualifier, 0)
+                    message_split = message.content[message_index + 1:]
+
+                    if message_split != '' and message_index != -1:
+                        if message_split not in System.forbidden_eval:
+                            try:
+                                message_send = eval(message_split)
+                            except BaseException:
+                                await sophia.send_message(message.channel,
+                                    System.eval_error_message[random.randrange(
+                                    System.eval_error_length)] + '\n' +
+                                    '```py\n' + traceback.format_exc() + '```')
+
+                            else:
+                                await sophia.send_message(message.channel, message_send)
+                        else:
+                            await sophia.send_message(message.channel, 'nope')
+                    else:
+                        await sophia.send_message(message.channel, ':eyes:')
+                else:
+                    await commands.debug_process(sys, random, traceback, asyncio, discord, psutil, bot_system, room,
+                        System, sophia, message, message_low, RoomInfo)
 
         else:
+            # await sophia.send_message(message.channel, 'message OK')
             await commands.trigger_commands(asyncio, sophia, message, message_low)
 
             if message.channel.id in TunnelInfo.channel_linked:
                 await chat_tunnel.chat_tunnel_process(sophia, message, TunnelInfo)
 
-    elif message.author.id == sophia.user.id and len(System.ping_information) != 0:
-        await bot_system.detailed_ping_edit(System, sophia, message)
+    else:
+        if message.channel.id in TunnelInfo.channel_linked and message.author.id != sophia.user.id:
+            channel_point = await chat_tunnel.channel_find(message, TunnelInfo)
+            tunnel_id = int(TunnelInfo.channel_relation[channel_point][2])
+            channel_id = TunnelInfo.channel_relation[channel_point][1]
+
+            # await sophia.send_message(message.channel, 'Switched to False')
+            TunnelInfo.tunnel_receive[tunnel_id][channel_id][2] = message.channel.id
+            TunnelInfo.tunnel_receive[tunnel_id][channel_id][3] = False
+
+        if message.author.id == sophia.user.id and len(System.ping_information) != 0:
+            await bot_system.detailed_ping_edit(System, sophia, message)
 
 
 while System.token_status is False:

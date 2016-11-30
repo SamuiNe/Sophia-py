@@ -18,7 +18,7 @@ async def tunnel_references(discord, message, tunnel_info, tunnel_password, tunn
         tunnel_info.tunnel_receive.append([[True, False, tunnel_name, tunnel_password]])
 
     current_tunnel = tunnel_info.tunnel_receive[tunnel_id]
-    current_tunnel.append([discord.utils.get(message.server.channels, id=channel_id), 3])
+    current_tunnel.append([discord.utils.get(message.server.channels, id=channel_id), 3, message.channel.id, False])
     append_point = len(current_tunnel) - 1
 
     tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
@@ -342,14 +342,6 @@ async def tunnel_delete_process(asyncio, sophia, tunnel_info, message, channel_p
     tunnel_channel_link = []
 
     while loop_count != loop_max:
-        tunnel_channel_relation.append(tunnel_info.channel_relation.index(
-                [current_tunnel[loop_count][0].id, loop_count, tunnel_id]))
-        tunnel_channel_link.append(tunnel_info.channel_linked.index(message.channel.id))
-
-        loop_count += 1
-    loop_count = 1
-
-    while loop_count != loop_max:
         await sophia.send_message(current_tunnel[loop_count][0] ,
             '\u26A0 The tunnel room manager has initiated tunnel room deletion.\n\n' +
             'All linked channels will be unlinked and ' +
@@ -358,6 +350,14 @@ async def tunnel_delete_process(asyncio, sophia, tunnel_info, message, channel_p
     loop_count = loop_max - 1
 
     await asyncio.sleep(5)
+
+    while loop_count != loop_max:
+        tunnel_channel_relation.append(tunnel_info.channel_relation.index(
+                [current_tunnel[loop_count][0].id, loop_count, tunnel_id]))
+        tunnel_channel_link.append(tunnel_info.channel_linked.index(message.channel.id))
+
+        loop_count += 1
+    loop_count = 1
 
     while loop_count != 0:
         del tunnel_info.channel_relation[tunnel_channel_relation[loop_count - 1]]
@@ -494,22 +494,42 @@ async def chat_tunnel_process(sophia, message, tunnel_info):
     # await sophia.send_message(message.channel, str(channel_point))
     if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][0][1]:
         if channel_point != -1:
-            loop_max = len(tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])])
-            loop_count = 1
             send_allowed = True
+            tunnel_id = int(tunnel_info.channel_relation[channel_point][2])
+            channel_id = tunnel_info.channel_relation[channel_point][1]
+            loop_max = len(tunnel_info.tunnel_receive[tunnel_id])
+            loop_count = 1
 
-            if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
-                    tunnel_info.channel_relation[channel_point][1]][1] != 0 and \
-                    tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
-                    tunnel_info.channel_relation[channel_point][1]][1] != 2:
+            if tunnel_info.tunnel_receive[tunnel_id][channel_id][1] != 0 and \
+                    tunnel_info.tunnel_receive[tunnel_id][channel_id][1] != 2:
+                # await sophia.send_message(message.channel, 'stage 1 pass')
                 while loop_count != loop_max and send_allowed:
-                    if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][
-                            loop_count][1] >= 2:
+                    # await sophia.send_message(message.channel, 'stage 2 pass')
+                    if tunnel_info.tunnel_receive[tunnel_id][loop_count][1] >= 2:
+                        # await sophia.send_message(message.channel, 'stage 3 pass')
                         if loop_count != tunnel_info.channel_relation[channel_point][1]:
-                            await sophia.send_message(tunnel_info.tunnel_receive[
-                                int(tunnel_info.channel_relation[channel_point][2])][
-                                loop_count][0],
-                                str(message.server) + ' / ' + str(message.channel) + ' - ' +
-                                str(message.author) + '\n' +
-                                '>> ' + str(message.content))
-                loop_count += 1
+                            # await sophia.send_message(message.channel, 'stage 4 pass')
+                            if tunnel_info.tunnel_receive[tunnel_id][loop_count][3]:
+                                await sophia.send_message(tunnel_info.tunnel_receive[tunnel_id][loop_count][0],
+                                    str(message.author) + '\n' +
+                                    str(message.timestamp)[11:16] + ' >> ' + str(message.content))
+
+                                if message.channel.id != tunnel_info.tunnel_receive[tunnel_id][loop_count][2]:
+                                    # await sophia.send_message(message.channel, 'Switched to False')
+                                    tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
+                                    tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = False
+
+                            else:
+                                await sophia.send_message(tunnel_info.tunnel_receive[tunnel_id][loop_count][0],
+                                    '<' + str(message.server) + ' / ' + str(message.channel) + '>\n' +
+                                    str(message.author) + '\n' +
+                                    str(message.timestamp)[11:16] + ' >> ' + str(message.content))
+                                # await sophia.send_message(message.channel, 'Switched to True')
+                                tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
+                                tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = True
+
+                        else:
+                            tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
+                            tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = False
+
+                    loop_count += 1
