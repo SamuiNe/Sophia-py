@@ -509,15 +509,15 @@ async def chat_tunnel_process(sophia, message, tunnel_info):
                         # await sophia.send_message(message.channel, 'stage 3 pass')
                         if loop_count != tunnel_info.channel_relation[channel_point][1]:
                             # await sophia.send_message(message.channel, 'stage 4 pass')
+                            if message.channel.id != tunnel_info.tunnel_receive[tunnel_id][loop_count][2]:
+                                # await sophia.send_message(message.channel, 'Switched to False')
+                                tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
+                                tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = False
+
                             if tunnel_info.tunnel_receive[tunnel_id][loop_count][3]:
                                 await sophia.send_message(tunnel_info.tunnel_receive[tunnel_id][loop_count][0],
                                     str(message.author) + '\n' +
                                     str(message.timestamp)[11:16] + ' >> ' + str(message.content))
-
-                                if message.channel.id != tunnel_info.tunnel_receive[tunnel_id][loop_count][2]:
-                                    # await sophia.send_message(message.channel, 'Switched to False')
-                                    tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
-                                    tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = False
 
                             else:
                                 await sophia.send_message(tunnel_info.tunnel_receive[tunnel_id][loop_count][0],
