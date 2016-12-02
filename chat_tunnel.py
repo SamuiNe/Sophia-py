@@ -496,31 +496,31 @@ async def chat_tunnel_process(sophia, message, tunnel_info):
         if channel_point != -1:
             send_allowed = True
             tunnel_id = int(tunnel_info.channel_relation[channel_point][2])
+            tunnel_content = tunnel_info.tunnel_receive[tunnel_id]
             channel_id = tunnel_info.channel_relation[channel_point][1]
-            loop_max = len(tunnel_info.tunnel_receive[tunnel_id])
+            loop_max = len(tunnel_content)
             loop_count = 1
 
-            if tunnel_info.tunnel_receive[tunnel_id][channel_id][1] != 0 and \
-                    tunnel_info.tunnel_receive[tunnel_id][channel_id][1] != 2:
+            if tunnel_content[channel_id][1] != 0 and tunnel_content[channel_id][1] != 2:
                 # await sophia.send_message(message.channel, 'stage 1 pass')
                 while loop_count != loop_max and send_allowed:
                     # await sophia.send_message(message.channel, 'stage 2 pass')
-                    if tunnel_info.tunnel_receive[tunnel_id][loop_count][1] >= 2:
+                    if tunnel_content[loop_count][1] >= 2:
                         # await sophia.send_message(message.channel, 'stage 3 pass')
                         if loop_count != tunnel_info.channel_relation[channel_point][1]:
                             # await sophia.send_message(message.channel, 'stage 4 pass')
-                            if message.channel.id != tunnel_info.tunnel_receive[tunnel_id][loop_count][2]:
+                            if message.channel.id != tunnel_content[loop_count][2]:
                                 # await sophia.send_message(message.channel, 'Switched to False')
                                 tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
                                 tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = False
 
-                            if tunnel_info.tunnel_receive[tunnel_id][loop_count][3]:
-                                await sophia.send_message(tunnel_info.tunnel_receive[tunnel_id][loop_count][0],
+                            if tunnel_content[loop_count][3]:
+                                await sophia.send_message(tunnel_content[loop_count][0],
                                     str(message.author) + '\n' +
                                     str(message.timestamp)[11:16] + ' >> ' + str(message.content))
 
                             else:
-                                await sophia.send_message(tunnel_info.tunnel_receive[tunnel_id][loop_count][0],
+                                await sophia.send_message(tunnel_content[loop_count][0],
                                     '<' + str(message.server) + ' / ' + str(message.channel) + '>\n' +
                                     str(message.author) + '\n' +
                                     str(message.timestamp)[11:16] + ' >> ' + str(message.content))
