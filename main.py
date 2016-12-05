@@ -59,7 +59,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.10'
+__version__ = '0.2.12'
 
 
 @sophia.event
@@ -121,30 +121,31 @@ async def on_message(message):
                     message_low, TunnelInfo)
 
             elif message.content.startswith(System.prefix_debug):
-                if message_low.startswith(System.prefix_debug + 'eval'):
-                    message_qualifier = ' '
-                    message_index = message.content.find(message_qualifier, 0)
-                    message_split = message.content[message_index + 1:]
+                if message.author.id in System.ATSUI:
+                    if message_low.startswith(System.prefix_debug + 'eval'):
+                        message_qualifier = ' '
+                        message_index = message.content.find(message_qualifier, 0)
+                        message_split = message.content[message_index + 1:]
 
-                    if message_split != '' and message_index != -1:
-                        if message_split not in System.forbidden_eval:
-                            try:
-                                message_send = eval(message_split)
-                            except BaseException:
-                                await sophia.send_message(message.channel,
-                                    System.eval_error_message[random.randrange(
-                                    System.eval_error_length)] + '\n' +
-                                    '```py\n' + traceback.format_exc() + '```')
+                        if message_split != '' and message_index != -1:
+                            if message_split not in System.forbidden_eval:
+                                try:
+                                    message_send = eval(message_split)
+                                except BaseException:
+                                    await sophia.send_message(message.channel,
+                                        System.eval_error_message[random.randrange(
+                                        System.eval_error_length)] + '\n' +
+                                        '```py\n' + traceback.format_exc() + '```')
 
+                                else:
+                                    await sophia.send_message(message.channel, message_send)
                             else:
-                                await sophia.send_message(message.channel, message_send)
+                                await sophia.send_message(message.channel, 'nope')
                         else:
-                            await sophia.send_message(message.channel, 'nope')
+                            await sophia.send_message(message.channel, ':eyes:')
                     else:
-                        await sophia.send_message(message.channel, ':eyes:')
-                else:
-                    await commands.debug_process(sys, random, traceback, asyncio, discord, psutil, bot_system, room,
-                        System, sophia, message, message_low, RoomInfo)
+                        await commands.debug_process(sys, random, traceback, asyncio, discord, psutil, bot_system, room,
+                            System, sophia, message, message_low, RoomInfo)
 
         else:
             # await sophia.send_message(message.channel, 'message OK')
