@@ -378,19 +378,23 @@ async def change_name(sophia, message):
 async def change_avatar(sophia, message):
     find_qualifier = ' '
     filename_position = message.content.find(find_qualifier, 0)
-    filename_change = message.content[filename_position + 1:] + '.png'
+    filename_change = message.content[filename_position + 1:]
 
-    await sophia.send_message(message.channel, filename_change)
-
-    file_point = open(filename_change, 'rb')
-    processed_file = file_point.read()
+    # await sophia.send_message(message.channel, filename_change)
 
     try:
-        await sophia.edit_profile(password='', avatar=processed_file)
-    except 'InvalidArgument':
-        await sophia.send_message(message.channel, 'Avatar change failed due to missing or bad image file.')
+        file_point = open(filename_change, 'rb')
+    except FileNotFoundError:
+        await sophia.send_message(message.channel, 'Image not found.')
     else:
-        await sophia.send_message(message.channel, 'Bot avatar has successfully changed.')
+        processed_file = file_point.read()
+
+        try:
+            await sophia.edit_profile(password='', avatar=processed_file)
+        except 'InvalidArgument':
+            await sophia.send_message(message.channel, 'Avatar change failed due to missing or bad image file.')
+        else:
+            await sophia.send_message(message.channel, 'Bot avatar has successfully changed.')
 
 
 async def trigger_toggle(system, sophia, message, message_low, permission):

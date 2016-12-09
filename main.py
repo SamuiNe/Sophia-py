@@ -59,7 +59,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.12'
+__version__ = '0.2.13'
 
 
 @sophia.event
@@ -80,8 +80,7 @@ async def on_ready():
     print('      [][]      []      [][]')
     print('          [][]  []  [][]')
     print('              [][][]')
-    print('Logged in as ' + sophia.user.name)
-    print('Discord ID: ' + sophia.user.id)
+    print('Logged in as ' + sophia.user.name + ', Discord ID ' + sophia.user.id + '.')
     print('Program created by SamuiNe <https://github.com/SamuiNe>')
     System.previous_playing_message = System.prefix_question + 'help for help'
     if System.test_mode:
@@ -110,7 +109,6 @@ async def on_message(message):
             is_person = False
 
     if is_person:
-
         if message.content.startswith(System.prefix_qualifier):
             if message.content.startswith(System.prefix_question):
                 await commands.question_process(bot_system, chat_tunnel, System, sophia, message, message_low,
@@ -144,7 +142,7 @@ async def on_message(message):
                         else:
                             await sophia.send_message(message.channel, ':eyes:')
                     else:
-                        await commands.debug_process(sys, random, traceback, asyncio, discord, psutil, bot_system, room,
+                        await commands.debug_process(sys, asyncio, discord, psutil, bot_system, room,
                             System, sophia, message, message_low, RoomInfo)
 
         else:
@@ -164,7 +162,7 @@ async def on_message(message):
             TunnelInfo.tunnel_receive[tunnel_id][channel_id][2] = message.channel.id
             TunnelInfo.tunnel_receive[tunnel_id][channel_id][3] = False
 
-        if message.author.id == sophia.user.id and len(System.ping_information) != 0:
+        if message.author.id == sophia.user.id and System.ping_information:
             await bot_system.detailed_ping_edit(System, sophia, message)
 
 

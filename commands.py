@@ -7,7 +7,7 @@ async def question_process(bot_system, chat_tunnel, system, sophia, message, mes
 
     elif message_low == system.prefix_question + 'botversion':
         await sophia.send_message(message.channel, 'My current version is ' + version +
-            ', which is last updated at 2016/11/30.')
+            ', which is last updated at 2016/12/06.')
 
     elif message.content == system.prefix_question + 'help':
         await bot_system.command_help(system, sophia, message)
@@ -65,7 +65,7 @@ async def information_process(asyncio, discord, bot_system, chat_tunnel, system,
         permission_check = await chat_tunnel.permission_check(system, message)
         await bot_system.trigger_toggle(system, sophia, message, message_low, permission_check)
 
-async def debug_process(sys, random, traceback, asyncio, discord, psutil, bot_system, room, system, sophia, message,
+async def debug_process(sys, asyncio, discord, psutil, bot_system, room, system, sophia, message,
         message_low, room_info):
 
     if message_low.startswith(system.prefix_debug + 'roomcheck'):
@@ -112,14 +112,6 @@ async def debug_process(sys, random, traceback, asyncio, discord, psutil, bot_sy
     elif message_low == system.prefix_debug + 'whack':
         await sophia.send_message(message.channel, 'o-ow!')
         await asyncio.sleep(5)
-        await sophia.send_message(message.channel, 'zzz')
-        await sophia.logout()
-
-    elif message_low == system.prefix_debug + 'explosion':
-        await sophia.send_message(message.channel, 'explooooosion!')
-        await asyncio.sleep(0.5)
-        await sophia.send_message(message.channel, ':boom:')
-        await asyncio.sleep(4.2)
         await sophia.send_message(message.channel, 'zzz')
         await sophia.logout()
 
