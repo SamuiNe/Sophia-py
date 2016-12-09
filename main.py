@@ -59,7 +59,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.13'
+__version__ = '0.2.15'
 
 
 @sophia.event
@@ -121,14 +121,12 @@ async def on_message(message):
             elif message.content.startswith(System.prefix_debug):
                 if message.author.id in System.ATSUI:
                     if message_low.startswith(System.prefix_debug + 'eval'):
-                        message_qualifier = ' '
-                        message_index = message.content.find(message_qualifier, 0)
-                        message_split = message.content[message_index + 1:]
+                        message_content = message.content.split(' ', maxsplit=1)
 
-                        if message_split != '' and message_index != -1:
-                            if message_split not in System.forbidden_eval:
+                        if len(message_content) > 1:
+                            if message_content[1] not in System.forbidden_eval:
                                 try:
-                                    message_send = eval(message_split)
+                                    message_send = eval(message_content[1])
                                 except BaseException:
                                     await sophia.send_message(message.channel,
                                         System.eval_error_message[random.randrange(
