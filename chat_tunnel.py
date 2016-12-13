@@ -12,15 +12,13 @@ class TunnelInformations:
         self.tunnel_receive = tunnel_receive
 
 
-async def tunnel_references(discord, message, tunnel_info, tunnel_password, tunnel_id, channel_id,
-        tunnel_name=None):
+async def tunnel_references(discord, message, tunnel_info, tunnel_password, tunnel_id, channel_id, tunnel_name=None):
     if tunnel_name is not None:
         tunnel_info.tunnel_receive.append([[True, False, tunnel_name, tunnel_password]])
 
-    current_tunnel = tunnel_info.tunnel_receive[tunnel_id]
-    current_tunnel.append([discord.utils.get(message.server.channels, id=channel_id), 3, message.channel.id, False,
-            message.author.id, False])
-    append_point = len(current_tunnel) - 1
+    tunnel_info.tunnel_receive[tunnel_id].append([discord.utils.get(message.server.channels, id=channel_id),
+            3, message.channel.id, False,message.author.id, False])
+    append_point = len(tunnel_info.tunnel_receive[tunnel_id]) - 1
 
     tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
     tunnel_info.channel_linked.append(message.channel.id)
@@ -29,7 +27,7 @@ async def tunnel_references(discord, message, tunnel_info, tunnel_password, tunn
 async def tunnel_link_process(discord, sophia, message, tunnel_info, tunnel_password, tunnel_id, channel_id):
     await tunnel_references(discord, message, tunnel_info, tunnel_password, tunnel_id, channel_id)
     await sophia.send_message(message.channel, 'Channel has successfully linked to tunnel room ' + str(tunnel_id) + '.')
-    await sophia.delete_message(message)
+    # await sophia.delete_message(message)
 
 
 async def tunnel_link(system, discord, sophia, message, tunnel_info):
@@ -70,7 +68,7 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
                             else:
                                 await sophia.send_message(message.channel, 'The channel has already' +
                                     'linked to an existing tunnel.')
-                                await sophia.delete_message(message)
+                                # await sophia.delete_message(message)
 
                         else:
                             await sophia.send_message(message.channel,
@@ -84,12 +82,12 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
                         else:
                             await sophia.send_message(message.channel,
                                 'The channel has already linked to an existing tunnel.')
-                            await sophia.delete_message(message)
+                            # await sophia.delete_message(message)
 
                 else:
                     await sophia.send_message(message.channel, 'Unable to link channel to tunnel room ' +
                         'since you did not have sufficient role permissions.')
-                    await sophia.delete_message(message)
+                    # await sophia.delete_message(message)
 
             else:
                 await sophia.send_message(message.channel, 'The tunnel you want to link has already been deleted.')
@@ -103,7 +101,7 @@ async def tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tun
     if tunnel_option == 'enable' or tunnel_option == 'yes' or tunnel_option == '1':
         tunnel_info.tunnel_receive[int(tunnel_id)][0][1] = True
         await sophia.send_message(message.channel, 'Tunnel ' + str(tunnel_id) + ' is now enabled.')
-        await sophia.delete_message(message)
+        # await sophia.delete_message(message)
 
     elif tunnel_option == 'disable' or tunnel_option == 'no' or tunnel_option == '2':
         tunnel_info.tunnel_receive[int(tunnel_id)][0][1] = False
@@ -282,6 +280,26 @@ async def tunnel_leave_process(sophia, message, tunnel_info, channel_point):
     tunnel_id = int(tunnel_info.channel_relation[channel_point][2])
     tunnel_index = tunnel_info.channel_relation[channel_point][1]
     tunnel_channel_link = tunnel_info.channel_linked.index(message.channel.id)
+    tunnel_length = len(tunnel_info.tunnel_receive[tunnel_id])
+
+    if tunnel_length > 2 and channel_point is not tunnel_length:
+        tunnel_loop = tunnel_index + 1
+        channel_loop = 0
+        preceding_channels = [None]
+        channel_max = len(tunnel_info.channel_relation)
+
+        while tunnel_loop < tunnel_length:
+            # await sophia.send_message(message.channel, str(tunnel_id) + " " + str(tunnel_loop))
+            preceding_channels.append(tunnel_info.tunnel_receive[tunnel_id][tunnel_loop][0].id)
+            tunnel_loop += 1
+
+        loop_counter = 0
+
+        while channel_loop < channel_max:
+            if tunnel_info.channel_relation[channel_loop][0] in preceding_channels:
+                tunnel_info.channel_relation[channel_loop][1] -= 1
+            channel_loop += 1
+
     del tunnel_info.tunnel_receive[tunnel_id][tunnel_index]
     del tunnel_info.channel_relation[channel_point]
     del tunnel_info.channel_linked[tunnel_channel_link]
@@ -291,7 +309,7 @@ async def tunnel_leave_process(sophia, message, tunnel_info, channel_point):
 
 async def tunnel_leave(system, sophia, message, tunnel_info):
     message_content = message.content.split(' ', maxsplit=1)
-    channel_point = await channel_find(message, tunnel_info)
+    channel_point = await current_channel_find(message, tunnel_info)
     role_permission = await permission_check(system, message)
 
     # await sophia.send_message(message.channel, str(channel_point) + ' ' + str(message_check))
@@ -365,7 +383,7 @@ async def tunnel_delete_process(asyncio, sophia, tunnel_info, message, channel_p
 
 async def tunnel_delete(asyncio, system, sophia, message, tunnel_info):
     message_content = message.content.split(' ', maxsplit=1)
-    channel_point = await channel_find(message, tunnel_info)
+    channel_point = await current_channel_find(message, tunnel_info)
     role_permission = await permission_check(system, message)
 
     if channel_point != -1:
@@ -397,7 +415,7 @@ async def tunnel_delete(asyncio, system, sophia, message, tunnel_info):
 
 async def tunnel_mode(system, sophia, message, tunnel_info):
     message_content = message.content.split(' ', maxsplit=1)
-    channel_point = await channel_find(message, tunnel_info)
+    channel_point = await current_channel_find(message, tunnel_info)
     role_permission = await permission_check(system, message)
 
     # await sophia.send_message(message.channel, str(channel_point))
@@ -436,12 +454,12 @@ async def tunnel_mode(system, sophia, message, tunnel_info):
     else:
         await sophia.send_message(message.channel, 'This channel is currently not linked to any tunnel room.')
 
-async def channel_find(message, tunnel_info):
+async def current_channel_find(message, tunnel_info):
     channel_max = len(tunnel_info.channel_relation)
     channel_loop = 0
     channel_value = -1
 
-    while channel_loop != channel_max and channel_value == -1:
+    while channel_loop < channel_max and channel_value == -1:
         if tunnel_info.channel_relation[channel_loop][0] == message.channel.id:
             channel_value = channel_loop
             return channel_value
@@ -475,7 +493,7 @@ async def ban_check(message, tunnel_info, server_id, channel_id):
         return True
 
 async def chat_tunnel_process(sophia, message, tunnel_info):
-    channel_point = await channel_find(message, tunnel_info)
+    channel_point = await current_channel_find(message, tunnel_info)
 
     # await sophia.send_message(message.channel, str(channel_point))
     if tunnel_info.tunnel_receive[int(tunnel_info.channel_relation[channel_point][2])][0][1]:
@@ -487,8 +505,7 @@ async def chat_tunnel_process(sophia, message, tunnel_info):
             loop_max = len(current_tunnel)
             loop_count = 1
 
-            if current_tunnel[channel_id][1] != 0 and \
-                    current_tunnel[channel_id][1] != 2:
+            if current_tunnel[channel_id][1] != 0 and current_tunnel[channel_id][1] != 2:
                 # await sophia.send_message(message.channel, 'stage 1 pass')
                 while loop_count != loop_max and send_allowed:
                     # await sophia.send_message(message.channel, 'stage 2 pass')

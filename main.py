@@ -59,7 +59,7 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.15'
+__version__ = '0.2.16'
 
 
 @sophia.event
@@ -152,7 +152,7 @@ async def on_message(message):
 
     else:
         if message.channel.id in TunnelInfo.channel_linked and message.author.id != sophia.user.id:
-            channel_point = await chat_tunnel.channel_find(message, TunnelInfo)
+            channel_point = await chat_tunnel.current_channel_find(message, TunnelInfo)
             tunnel_id = int(TunnelInfo.channel_relation[channel_point][2])
             channel_id = TunnelInfo.channel_relation[channel_point][1]
 

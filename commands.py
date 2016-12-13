@@ -7,7 +7,7 @@ async def question_process(bot_system, chat_tunnel, system, sophia, message, mes
 
     elif message_low == system.prefix_question + 'botversion':
         await sophia.send_message(message.channel, 'My current version is ' + version +
-            ', which is last updated at 2016/12/06.')
+            ', which is last updated at 2016/12/14.')
 
     elif message.content == system.prefix_question + 'help':
         await bot_system.command_help(system, sophia, message)
