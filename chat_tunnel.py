@@ -66,7 +66,7 @@ async def tunnel_link(system, discord, sophia, message, tunnel_info):
                                         tunnel_id, channel_id)
 
                             else:
-                                await sophia.send_message(message.channel, 'The channel has already' +
+                                await sophia.send_message(message.channel, 'The channel has already ' +
                                     'linked to an existing tunnel.')
                                 # await sophia.delete_message(message)
 
@@ -114,7 +114,7 @@ async def tunnel_enable_process(sophia, message, tunnel_info, tunnel_option, tun
 
 
 async def tunnel_enable(system, sophia, message, message_low, tunnel_info):
-    message_low_content = message_low.content.split(' ', maxsplit=3)
+    message_low_content = message_low.split(' ', maxsplit=3)
     channel_id = message.channel.id
     tunnel_password = ''
     role_permission = await permission_check(system, message)
@@ -122,7 +122,7 @@ async def tunnel_enable(system, sophia, message, message_low, tunnel_info):
     # await sophia.send_message(message.channel, str(len(tunnel_id)) + ' ' + str(tunnel_id))
     # await sophia.send_message(message.channel, str(message_check))
 
-    if len(message_low_content) > 2:
+    if len(message_low_content) > 3:
         tunnel_option = message_low_content[2]
         tunnel_password = message_low_content[3]
     else:
@@ -131,7 +131,7 @@ async def tunnel_enable(system, sophia, message, message_low, tunnel_info):
     # await sophia.send_message(message.channel, str(len(tunnel_password)) + tunnel_password)
     try:
         tunnel_id = message_low_content[1]
-        current_tunnel = tunnel_info.tunnel_receive[tunnel_id]
+        current_tunnel = tunnel_info.tunnel_receive[int(tunnel_id)]
     except ValueError:
         await sophia.send_message(message.channel, 'The command format you have entered is invalid.\n' +
             'The command format is `' + system.prefix_information + 'tunnelenable `*`tunnel_id option room_password`*')
@@ -244,7 +244,7 @@ async def tunnel_create(discord, system, sophia, message, tunnel_info):
 
     if usage_allowed:
         if role_permission:
-            if message_content_length > 2:
+            if message_content_length >= 2:
                 if message_content_length == 3:
                     tunnel_name = message_content[1]
                     tunnel_password = message_content[2]
@@ -260,14 +260,14 @@ async def tunnel_create(discord, system, sophia, message, tunnel_info):
                 await sophia.send_message(message.channel, str(tunnel_name) +
                     ' has successfully created and linked.\n' +
                     'Your tunnel ID is ' + str(tunnel_count) + '.')
-                await sophia.delete_message(message)
+                # await sophia.delete_message(message)
 
             else:
                 await sophia.send_message(message.channel, 'Tunnel room creation failed since ' +
                     'you did not specify a room name nor password.')
 
         else:
-            await sophia.delete_message(message)
+            # await sophia.delete_message(message)
             await sophia.send_message(message.channel, 'Unable to create tunnel room since ' +
                 'you do not have sufficient role permissions.')
 

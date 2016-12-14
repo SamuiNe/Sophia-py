@@ -1,6 +1,6 @@
 # coding=UTF-8
 
-__version__ = '0.2.17'
+__version__ = '0.2.18'
 
 
 async def question_process(bot_system, chat_tunnel, system, sophia, message, message_low, tunnel_info):
@@ -87,16 +87,15 @@ async def debug_process(sys, asyncio, discord, psutil, bot_system, room, system,
 
     elif message_low == system.prefix_debug + 'status':
         await sophia.send_message(message.channel, 'Current Sophia status:\n' +
-            '`CPU` ' + str(psutil.cpu_percent()) + '% `' +
+            '`CPU`  ' + '%5s' % str(psutil.cpu_percent()) + '% - `' +
             str(psutil.cpu_count()) + ' logical CPU(s)`\n' +
-            '`RAM` ' + str( round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
+            '`RAM`  ' + '%5s' % str(psutil.virtual_memory().percent) + '% - ' +
+            str( round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
             str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) +
-            ' ' + ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MB` (' +
-            str(psutil.virtual_memory().percent) + '%)\n' +
-            '`Disk` ' + str(
-            round((psutil.disk_usage('/').used / 1024 ** 2), 2)) + ' / ' +
-            str(round(psutil.disk_usage('/').total / (1024 ** 2), 2)) + ' `MB` (' +
-            str(psutil.disk_usage('/').percent) + '%)\n')
+            ' ' + ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MB`\n' +
+            '`Disk` ' + '%5s' % str(psutil.disk_usage('/').percent) + '% - ' +
+            str(round((psutil.disk_usage('/').used / 1024 ** 2), 2)) + ' / ' +
+            str(round(psutil.disk_usage('/').total / (1024 ** 2), 2)) + ' `MB`')
 
     elif message_low == system.prefix_debug + 'suspend':
         await asyncio.sleep(5)
