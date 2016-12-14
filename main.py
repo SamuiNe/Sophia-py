@@ -2,6 +2,7 @@
 """Text encoding UTF-8"""
 
 # python built-in modules
+import importlib
 import logging
 import sys
 import random
@@ -59,8 +60,6 @@ RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
         [['Testing room', 'Blackjack', 'Testing', '0']])
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
-__version__ = '0.2.16'
-
 
 @sophia.event
 async def on_ready():
@@ -89,7 +88,7 @@ async def on_ready():
         await sophia.change_presence(game=discord.Game(name=System.previous_playing_message))
 
     token.close()
-    print('Sophia Version ' + __version__ + ', Ready.')
+    print('Sophia Version ' + commands.__version__ + ', Ready.')
 
 
 @sophia.event
@@ -112,7 +111,7 @@ async def on_message(message):
         if message.content.startswith(System.prefix_qualifier):
             if message.content.startswith(System.prefix_question):
                 await commands.question_process(bot_system, chat_tunnel, System, sophia, message, message_low,
-                    TunnelInfo, __version__)
+                    TunnelInfo)
 
             elif message.content.startswith(System.prefix_information):
                 await commands.information_process(asyncio, discord, bot_system, chat_tunnel, System, sophia, message,
@@ -139,6 +138,15 @@ async def on_message(message):
                                 await sophia.send_message(message.channel, 'nope')
                         else:
                             await sophia.send_message(message.channel, ':eyes:')
+
+                    elif message_low.startswith(System.prefix_debug + 'modulereload'):
+                        importlib.reload(commands)
+                        importlib.reload(chat_tunnel)
+                        importlib.reload(bot_system)
+                        importlib.reload(room)
+
+                        await sophia.send_message(message.channel, 'Dependant modules has successfully reloaded.')
+
                     else:
                         await commands.debug_process(sys, asyncio, discord, psutil, bot_system, room,
                             System, sophia, message, message_low, RoomInfo)

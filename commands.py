@@ -1,12 +1,14 @@
 # coding=UTF-8
 
+__version__ = '0.2.17'
 
-async def question_process(bot_system, chat_tunnel, system, sophia, message, message_low, tunnel_info, version):
+
+async def question_process(bot_system, chat_tunnel, system, sophia, message, message_low, tunnel_info):
     if message_low == system.prefix_question + 'about':
         await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
     elif message_low == system.prefix_question + 'botversion':
-        await sophia.send_message(message.channel, 'My current version is ' + version +
+        await sophia.send_message(message.channel, 'My current version is ' + __version__ +
             ', which is last updated at 2016/12/14.')
 
     elif message.content == system.prefix_question + 'help':
@@ -83,13 +85,18 @@ async def debug_process(sys, asyncio, discord, psutil, bot_system, room, system,
     elif message_low.startswith(system.prefix_debug + 'prefixchange'):
         await bot_system.prefix_change(system, sophia, message, message_low)
 
-    elif message_low == system.prefix_debug + 'mpstatus':
-        await sophia.send_message(message.channel, 'Current MP status:\n\n' +
-            '`Allocated` ' + str( round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
+    elif message_low == system.prefix_debug + 'status':
+        await sophia.send_message(message.channel, 'Current Sophia status:\n' +
+            '`CPU` ' + str(psutil.cpu_percent()) + '% `' +
+            str(psutil.cpu_count()) + ' logical CPU(s)`\n' +
+            '`RAM` ' + str( round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
             str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) +
-            ' `MP` (' + str(psutil.virtual_memory().percent) + '%)\n' +
-            '`Available` ' + str( round(psutil.virtual_memory().available / (1024 ** 2), 2)) +
-            ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MP`')
+            ' ' + ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MB` (' +
+            str(psutil.virtual_memory().percent) + '%)\n' +
+            '`Disk` ' + str(
+            round((psutil.disk_usage('/').used / 1024 ** 2), 2)) + ' / ' +
+            str(round(psutil.disk_usage('/').total / (1024 ** 2), 2)) + ' `MB` (' +
+            str(psutil.disk_usage('/').percent) + '%)\n')
 
     elif message_low == system.prefix_debug + 'suspend':
         await asyncio.sleep(5)
