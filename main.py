@@ -105,9 +105,9 @@ async def on_message(message):
 
     if System.test_mode:
         if message.server.id not in System.allowed_testing:
-            is_person = False
+            is_allowed = False
 
-    if is_person:
+    if is_person and is_allowed:
         if message.content.startswith(System.prefix_qualifier):
             if message.content.startswith(System.prefix_question):
                 await commands.question_process(bot_system, chat_tunnel, System, sophia, message, message_low,
@@ -153,7 +153,8 @@ async def on_message(message):
 
         else:
             # await sophia.send_message(message.channel, 'message OK')
-            await commands.trigger_commands(asyncio, sophia, message, message_low)
+            if message.server.id in System.trigger_exclude:
+                await commands.trigger_commands(asyncio, sophia, message, message_low)
 
             if message.channel.id in TunnelInfo.channel_linked:
                 await chat_tunnel.chat_tunnel_process(sophia, message, TunnelInfo)

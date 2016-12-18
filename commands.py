@@ -1,17 +1,18 @@
 # coding=UTF-8
 
-__version__ = '0.2.18'
+__version__ = '0.2.19'
 
 
+# TODO: Add poll command
 async def question_process(bot_system, chat_tunnel, system, sophia, message, message_low, tunnel_info):
     if message_low == system.prefix_question + 'about':
         await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
     elif message_low == system.prefix_question + 'botversion':
         await sophia.send_message(message.channel, 'My current version is ' + __version__ +
-            ', which is last updated at 2016/12/14.')
+            ', which is last updated at 2016/12/18.')
 
-    elif message.content == system.prefix_question + 'help':
+    elif message_low == system.prefix_question + 'help':
         await bot_system.command_help(system, sophia, message)
 
     elif message_low.startswith(system.prefix_question + 'command'):
@@ -33,12 +34,11 @@ async def information_process(asyncio, discord, bot_system, chat_tunnel, system,
         ping_message = 'ping!'
         await bot_system.detailed_ping(system, sophia, message, ping_message)
 
-    elif message.content == system.prefix_information + 'hello':
+    elif message_low == system.prefix_information + 'hello':
         mess_len = len(str(message.author))
         await sophia.send_message(message.channel, 'Hello ' + str(message.author)[:mess_len - 5] + ' o/')
 
-    elif message_low == system.prefix_information + 'sarachan' or \
-                    message_low == system.prefix_information + 'sara':
+    elif message_low == system.prefix_information + 'sarachan' or message_low == system.prefix_information + 'sara':
         await sophia.send_message(message.channel, 'http://sophia.samuine.net/content/scratchwalls.gif')
 
     elif message_low == system.prefix_information + 'invite':
@@ -101,14 +101,14 @@ async def debug_process(sys, asyncio, discord, psutil, bot_system, room, system,
         await asyncio.sleep(5)
         await sophia.send_message(message.channel, 'Suspend complete')
 
-    elif message.content.startswith(system.prefix_debug + 'playchange'):
-        game_message = str(message.content)[14:]
-        system.previous_playing_message = game_message
+    elif message_low.startswith(system.prefix_debug + 'playchange'):
+        game_message = message.content.split(' ', maxsplit=1)
+        system.previous_playing_message = game_message[1]
 
-        await sophia.change_presence(game=discord.Game(name=game_message))
+        await sophia.change_presence(game=discord.Game(name=game_message[1]))
         await sophia.send_message(message.channel, 'Playing message has successfully updated.')
 
-    elif message.content.startswith(system.prefix_debug + 'testmode'):
+    elif message_low.startswith(system.prefix_debug + 'testmode'):
         await bot_system.testing_mode(system, discord, sophia, message, message_low)
 
     elif message_low == system.prefix_debug + 'rest':
