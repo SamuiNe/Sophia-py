@@ -1,135 +1,155 @@
-# coding=UTF-8
+# coding=utf-8
 
-__version__ = '0.2.19'
+# Other required python built-in modules
+import random
+import traceback
+import sys
+
+# Other modules
+import psutil
+
+
+__version__ = '0.2.20'
 
 
 # TODO: Add poll command
-async def question_process(bot_system, chat_tunnel, system, sophia, message, message_low, tunnel_info):
-    if message_low == system.prefix_question + 'about':
+async def command_process(asyncio, discord, bot_system, chat_tunnel, system, sophia, message, message_low, tunnel_info):
+    if message_low == system.prefix + 'about':
         await sophia.send_message(message.channel, 'Hello! I am Sophia. Please treat me well!')
 
-    elif message_low == system.prefix_question + 'botversion':
+    elif message_low == system.prefix + 'botversion':
         await sophia.send_message(message.channel, 'My current version is ' + __version__ +
             ', which is last updated at 2016/12/18.')
 
-    elif message_low == system.prefix_question + 'help':
+    elif message_low == system.prefix + 'help':
         await bot_system.command_help(system, sophia, message)
 
-    elif message_low.startswith(system.prefix_question + 'command'):
+    elif message_low.startswith(system.prefix + 'command'):
         await bot_system.individual_command_help(system, sophia, message)
 
-    elif message_low == system.prefix_question + 'infocheck':
+    elif message_low == system.prefix + 'infocheck':
         await bot_system.info_check(sophia, message)
 
-    elif message_low.startswith(system.prefix_question + 'tunnelcheck'):
+    elif message_low.startswith(system.prefix + 'tunnelcheck'):
         await chat_tunnel.tunnel_information(sophia, message, tunnel_info)
 
-async def information_process(asyncio, discord, bot_system, chat_tunnel, system, sophia, message,
-        message_low, tunnel_info):
-    if message_low == system.prefix_information + 'ping':
+# Old command question prefix
+
+    if message_low == system.prefix + 'ping':
         ping_message = 'pong!'
         await bot_system.detailed_ping(system, sophia, message, ping_message)
 
-    elif message_low == system.prefix_information + 'pong':
+    elif message_low == system.prefix + 'pong':
         ping_message = 'ping!'
         await bot_system.detailed_ping(system, sophia, message, ping_message)
 
-    elif message_low == system.prefix_information + 'hello':
+    elif message_low == system.prefix + 'hello':
         mess_len = len(str(message.author))
         await sophia.send_message(message.channel, 'Hello ' + str(message.author)[:mess_len - 5] + ' o/')
 
-    elif message_low == system.prefix_information + 'sarachan' or message_low == system.prefix_information + 'sara':
+    elif message_low == system.prefix + 'sarachan' or message_low == system.prefix + 'sara':
         await sophia.send_message(message.channel, 'http://sophia.samuine.net/content/scratchwalls.gif')
 
-    elif message_low == system.prefix_information + 'invite':
+    elif message_low == system.prefix + 'invite':
         await bot_system.server_invite(sophia, message)
 
-    elif message_low.startswith(system.prefix_information + 'tunnel'):
-        if message_low.startswith(system.prefix_information + 'tunnellink'):
+    elif message_low.startswith(system.prefix + 'tunnel'):
+        if message_low.startswith(system.prefix + 'tunnellink'):
             await chat_tunnel.tunnel_link(system, discord, sophia, message, tunnel_info)
 
-        elif message_low.startswith(system.prefix_information + 'tunnelenable'):
+        elif message_low.startswith(system.prefix + 'tunnelenable'):
             await chat_tunnel.tunnel_enable(system, sophia, message, message_low, tunnel_info)
 
-        elif message_low.startswith(system.prefix_information + 'tunnelmode'):
+        elif message_low.startswith(system.prefix + 'tunnelmode'):
             await chat_tunnel.tunnel_mode(system, sophia, message, tunnel_info)
 
-        elif message_low.startswith(system.prefix_information + 'tunnelcreate'):
+        elif message_low.startswith(system.prefix + 'tunnelcreate'):
             await chat_tunnel.tunnel_create(discord, system, sophia, message, tunnel_info)
 
-        elif message_low.startswith(system.prefix_information + 'tunnelleave'):
+        elif message_low.startswith(system.prefix + 'tunnelleave'):
             await chat_tunnel.tunnel_leave(system, sophia, message, tunnel_info)
 
-        elif message_low.startswith(system.prefix_information + 'tunneldelete'):
+        elif message_low.startswith(system.prefix + 'tunneldelete'):
             await  chat_tunnel.tunnel_delete(asyncio, system, sophia, message, tunnel_info)
 
-    elif message_low.startswith(system.prefix_information + 'triggertoggle'):
+    elif message_low.startswith(system.prefix + 'triggertoggle'):
         permission_check = await chat_tunnel.permission_check(system, message)
         await bot_system.trigger_toggle(system, sophia, message, message_low, permission_check)
 
-async def debug_process(sys, asyncio, discord, psutil, bot_system, room, system, sophia, message,
-        message_low, room_info):
+# Old command debug prefix
 
-    if message_low.startswith(system.prefix_debug + 'roomcheck'):
-        await room.room_check(room_info, sophia, message, message_low)
+    if message.author.id in system.ATSUI:
+        if message_low.startswith(system.prefix + 'eval'):
+            message_content = message.content.split(' ', maxsplit=1)
 
-    elif message_low.startswith(system.prefix_debug + 'roomcreate'):
-        await room.room_create(system, room_info, sophia, message, message_low)
+            if len(message_content) > 1:
+                if message_content[1] not in system.forbidden_eval:
+                    try:
+                        message_send = eval(message_content[1])
+                    except BaseException:
+                        await sophia.send_message(message.channel,
+                                                  system.eval_error_message[random.randrange(
+                                                      system.eval_error_length)] + '\n' +
+                                                  '```py\n' + traceback.format_exc() + '```')
 
-    elif message_low.startswith(system.prefix_debug + 'roomjoin'):
-        await room.room_join(room_info, sophia, message, message_low)
+                    else:
+                        await sophia.send_message(message.channel, message_send)
+                else:
+                    await sophia.send_message(message.channel, 'nope')
+            else:
+                await sophia.send_message(message.channel, ':eyes:')
 
-    elif message_low == system.prefix_debug + 'secret':
-        await sophia.send_message(message.channel, 'Nothing to see here!')
+        elif message_low == system.prefix + 'secret':
+            await sophia.send_message(message.channel, 'Nothing to see here!')
 
-    elif message_low.startswith(system.prefix_debug + 'prefixchange'):
-        await bot_system.prefix_change(system, sophia, message, message_low)
+        elif message_low.startswith(system.prefix + 'prefixchange'):
+            await bot_system.prefix_change(system, sophia, message)
 
-    elif message_low == system.prefix_debug + 'status':
-        await sophia.send_message(message.channel, 'Current Sophia status:\n' +
-            '`CPU`  ' + '%5s' % str(psutil.cpu_percent()) + '% - `' +
-            str(psutil.cpu_count()) + ' logical CPU(s)`\n' +
-            '`RAM`  ' + '%5s' % str(psutil.virtual_memory().percent) + '% - ' +
-            str( round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
-            str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) +
-            ' ' + ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MB`\n' +
-            '`Disk` ' + '%5s' % str(psutil.disk_usage('/').percent) + '% - ' +
-            str(round((psutil.disk_usage('/').used / 1024 ** 2), 2)) + ' / ' +
-            str(round(psutil.disk_usage('/').total / (1024 ** 2), 2)) + ' `MB`')
+        elif message_low == system.prefix + 'status':
+            await sophia.send_message(message.channel, 'Current Sophia status:\n' +
+                '`CPU`  ' + '%5s' % str(psutil.cpu_percent()) + '% - `' +
+                str(psutil.cpu_count()) + ' logical CPU(s)`\n' +
+                '`RAM`  ' + '%5s' % str(psutil.virtual_memory().percent) + '% - ' +
+                str( round(((sys.getallocatedblocks() * 512) / 1024 ** 2), 2)) + ' `(py)` / ' +
+                str(round(psutil.virtual_memory().used / (1024 ** 2), 2)) +
+                ' ' + ' / ' + str(round(psutil.virtual_memory().total / (1024 ** 2), 2)) + ' `MB`\n' +
+                '`Disk` ' + '%5s' % str(psutil.disk_usage('/').percent) + '% - ' +
+                str(round((psutil.disk_usage('/').used / 1024 ** 2), 2)) + ' / ' +
+                str(round(psutil.disk_usage('/').total / (1024 ** 2), 2)) + ' `MB`')
 
-    elif message_low == system.prefix_debug + 'suspend':
-        await asyncio.sleep(5)
-        await sophia.send_message(message.channel, 'Suspend complete')
+        elif message_low == system.prefix + 'suspend':
+            await asyncio.sleep(5)
+            await sophia.send_message(message.channel, 'Suspend complete')
 
-    elif message_low.startswith(system.prefix_debug + 'playchange'):
-        game_message = message.content.split(' ', maxsplit=1)
-        system.previous_playing_message = game_message[1]
+        elif message_low.startswith(system.prefix + 'playchange'):
+            game_message = message.content.split(' ', maxsplit=1)
+            system.previous_playing_message = game_message[1]
 
-        await sophia.change_presence(game=discord.Game(name=game_message[1]))
-        await sophia.send_message(message.channel, 'Playing message has successfully updated.')
+            await sophia.change_presence(game=discord.Game(name=game_message[1]))
+            await sophia.send_message(message.channel, 'Playing message has successfully updated.')
 
-    elif message_low.startswith(system.prefix_debug + 'testmode'):
-        await bot_system.testing_mode(system, discord, sophia, message, message_low)
+        elif message_low.startswith(system.prefix + 'testmode'):
+            await bot_system.testing_mode(system, discord, sophia, message, message_low)
 
-    elif message_low == system.prefix_debug + 'rest':
-        await sophia.send_message(message.channel, 'I will rest for now. Good night!')
-        await sophia.logout()
+        elif message_low == system.prefix + 'rest':
+            await sophia.send_message(message.channel, 'I will rest for now. Good night!')
+            await sophia.logout()
 
-    elif message_low == system.prefix_debug + 'whack':
-        await sophia.send_message(message.channel, 'o-ow!')
-        await asyncio.sleep(5)
-        await sophia.send_message(message.channel, 'zzz')
-        await sophia.logout()
+        elif message_low == system.prefix + 'whack':
+            await sophia.send_message(message.channel, 'o-ow!')
+            await asyncio.sleep(5)
+            await sophia.send_message(message.channel, 'zzz')
+            await sophia.logout()
 
-    elif message_low.startswith(system.prefix_debug + 'changename'):
-        await bot_system.change_name(sophia, message)
+        elif message_low.startswith(system.prefix + 'changename'):
+            await bot_system.change_name(sophia, message)
 
-    elif message_low.startswith(system.prefix_debug + 'changeavatar'):
-        await bot_system.change_avatar(sophia, message)
+        elif message_low.startswith(system.prefix + 'changeavatar'):
+            await bot_system.change_avatar(sophia, message)
 
-    elif message_low.startswith(system.prefix_debug + 'leaveserver'):
-        await sophia.send_message(message.channel, 'Server leave success')
-        await sophia.leave_server(message.server)
+        elif message_low.startswith(system.prefix + 'leaveserver'):
+            await sophia.send_message(message.channel, 'Server leave success')
+            await sophia.leave_server(message.server)
 
 async def trigger_commands(asyncio, sophia, message, message_low):
     if message.content == '\u252c\u2500\u252c\ufeff \u30ce\u0028 \u309c\u002d\u309c\u30ce\u0029':

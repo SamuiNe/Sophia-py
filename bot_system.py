@@ -44,14 +44,11 @@ class SystemVariables:
         Entry of previous playing message.
         For playing message storage when testing mode is turned on and off."""
 
-    def __init__(self, prefix_qualifier, prefix_question, prefix_information,
-            prefix_debug, test_mode, allowed_testing, atsui, trigger_exclude,
+    def __init__(self, prefix_qualifier, prefix, test_mode, allowed_testing, atsui, trigger_exclude,
             previous_playing_message, forbidden_eval, token_status,
             custom_filename_status, custom_filename_path, eval_error_message):
         self.prefix_qualifier = prefix_qualifier
-        self.prefix_question = prefix_question
-        self.prefix_information = prefix_information
-        self.prefix_debug = prefix_debug
+        self.prefix = prefix
         self.test_mode = test_mode
         self.allowed_testing = allowed_testing
         self.ATSUI = atsui
@@ -266,10 +263,8 @@ async def detailed_ping(system, sophia, message, ping_message):
 async def detailed_ping_edit(system, sophia, message):
     if message.channel.id == system.ping_information[0][0]:
         message_content = message.content
-        timestamp_value = message.timestamp.hour * 3600000 + \
-                          message.timestamp.minute * 60000 + \
-                          message.timestamp.second * 1000 + \
-                          int(message.timestamp.microsecond / 1000)
+        timestamp_value = message.timestamp.hour * 3600000 + message.timestamp.minute * 60000 + \
+                message.timestamp.second * 1000 + (message.timestamp.microsecond // 1000)
 
         timestamp_difference = timestamp_value - system.ping_information[0][1]
         if timestamp_difference < 0:
@@ -297,75 +292,30 @@ async def testing_mode(system, discord, sophia, message, message_low):
         await sophia.change_presence(game=discord.Game(name=system.previous_playing_message))
         await sophia.send_message(message.channel, 'Testing mode disabled')
 
-async def prefix_change(system, sophia, message, message_low):
+async def prefix_change(system, sophia, message):
     """Changes the bot's prefix.
 
     This command alters the following variables:
         SystemVariables.prefix_qualifier
-        SystemVariables.prefix_question
-        SystemVariables.prefix_information
-        SystemVariables.prefix_debug"""
-    process_index = [0, None, None, None, None, None]
-    temp_collection = ['<', None, None, None, None]
-    exception_check = False
-    find_qualifier = ' '
-    find_check_after = 0
-    find_count = 0
-    process_count = 1
-    temp_counter = 0
-    exception_counter = 0
+        SystemVariables.prefix"""
+    message_split = message.content.split(' ', maxsplit=2)
 
-    while find_check_after != -1 and find_count != 5:
-        find_check_before = find_check_after
-        find_check_after = message_low.find(find_qualifier, find_check_before + 1)
-
-        if find_check_after != -1:
-            find_count += 1
-            process_index[find_count] = find_check_after
-
-    while process_index[process_count] is not None and process_count != 5:
-        if process_count == 4:
-            temp_collection[temp_counter] = message_low[process_index[process_count] + 1:]
+    if message_split[2] is not None:
+        if message_split[2].startswith(message_split[1]):
+            exception_check = False
         else:
-            temp_collection[temp_counter] = message_low[process_index[process_count] + 1:
-                    process_index[process_count + 1]]
-
-        temp_counter += 1
-        process_count += 1
-
-    if temp_collection[exception_counter] is not None and \
-            temp_collection[exception_counter + 1] is not None:
-
-        while temp_collection[exception_counter] is not None and exception_counter != 4:
-
-            if temp_collection[0] not in temp_collection[exception_counter]:
-                exception_check = True
-            exception_counter += 1
+            exception_check = True
+    else:
+        exception_check = True
 
     if exception_check:
         await sophia.send_message(message.channel, 'Prefix change failed')
 
     else:
-        system.prefix_qualifier = temp_collection[0]
-        system.prefix_question = temp_collection[1]
-        system.prefix_information = temp_collection[2]
-        system.prefix_debug = temp_collection[3]
+        system.prefix_qualifier = message_split[1]
+        system.prefix = message_split[2]
 
         await sophia.send_message(message.channel, 'Prefix change success')
-        '''Debug code
-
-        await sophia.send_message(message.channel, 'Debug information:\n' + str(find_check_before) +
-            ' ' + str(find_check_after) + ' ' + str(find_count) + ' ' + str(process_count) + ' ' +
-            str(temp_counter) + ' ' + str(exception_counter) + '\n' +
-            str(exception_check) + '\n' +
-            '> ' + str(process_index[0]) + ' ' + str(process_index[1]) + ' ' +
-            str(process_index[2]) + ' ' + str(process_index[3]) + ' ' +
-            str(process_index[4]) + ' ' + str(process_index[5]) + '\n' +
-            '>> ' + str(temp_collection[0]) + ' ' + str(temp_collection[1]) + ' ' +
-            str(temp_collection[2]) + ' ' + str(temp_collection[3]) + '\n' +
-            'L> ' + str(len(str(temp_collection[0]))) + ', ' + str(len(str(temp_collection[1]))) +
-            ', ' + str(len(str(temp_collection[2]))) + ', ' + str(len(str(temp_collection[3]))))
-        '''
 
 async def change_name(sophia, message):
     find_qualifier = ' '

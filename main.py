@@ -5,13 +5,10 @@
 import importlib
 import logging
 import sys
-import random
-import traceback
 
 # other modules
 import asyncio
 import discord
-import psutil
 
 # sophia modules
 import commands
@@ -22,9 +19,7 @@ import chat_tunnel
 logging.basicConfig(level=logging.INFO)
 System = bot_system.SystemVariables(
         prefix_qualifier='>',
-        prefix_question='>?',
-        prefix_information='>!',
-        prefix_debug='>>',
+        prefix='>>',
         test_mode=False,
         allowed_testing=['154488551596228610', '164476517101993984'],
         atsui=('153789058059993088', '207711558866960394'),
@@ -36,25 +31,17 @@ System = bot_system.SystemVariables(
         token_status=False,
         custom_filename_status=False,
         custom_filename_path='',
-        eval_error_message=('ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa',
-            'GRAND DAD', 'b-baka!!!', '300 internal server error',
-            'i-its not like I want to help you or anything!',
-            'git gud', 'did you re-read the code before entering it?',
-            'too much php for today?', 'maybe you need some rest?',
-            'maybe this might help you?', 'some snek told me this',
-            'still better than recursive infinite loop',
-            'you\'ve messed up again?', 'try not to rely on eval too much',
-            'don\'t worry, at least you\'re improving',
-            'maybe you need to understand the code first before evaling?',
-            'zzz', ':eyes:', 'wew', '400 bad request', '406 not acceptable',
-            '418 I\'m a teapot', '451 unavailable for legal reasons',
-            'are you bored at the moment?', 'snek? snek?! snek!!!',
-            'you\'ve tried™', 'sdjkfhakjlhfskajhfkjlhf', 'what are you doing?',
-            'I am an error message fairy', 'are you having fun?',
-            'wew lad', 'how many times are you going to do this?',
-            'p-please be gentle', 'you have found a rare item!',
-            'I\'ll slap you for this', 'no cookies for you today!',
-            'I\'ll revoke your programming certificate', 'again?'))
+        eval_error_message=('ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa', 'GRAND DAD', 'b-baka!!!',
+            'i-its not like I want to help you or anything!', 'git gud', 'did you re-read the code before entering it?',
+            'too much php for today?', 'maybe you need some rest?', 'maybe this might help you?',
+            'some snek told me this', 'still better than recursive infinite loop', 'you\'ve messed up again?',
+            'try not to rely on eval too much', 'don\'t worry, at least you\'re improving',
+            'maybe you need to understand the code first before evaling?', 'zzz', ':eyes:', 'wew',
+            '418 I\'m a teapot', 'are you bored at the moment?', 'you\'ve tried™', 'sdjkfhakjlhfskajhfkjlhf',
+            'what are you doing?', 'I am an error message fairy', 'are you having fun?', 'wew lad',
+            'how many times are you going to do this?', 'p-please be gentle', 'you have found a rare item!',
+            'I\'ll slap you for this', 'no cookies for you today!', 'I\'ll revoke your programming certificate',
+            'again?'))
 RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
         ('Waiting', 'In Progress', 'Deleted'),
         [['Testing room', 'Blackjack', 'Testing', '0']])
@@ -81,7 +68,7 @@ async def on_ready():
     print('              [][][]')
     print('Logged in as ' + sophia.user.name + ', Discord ID ' + sophia.user.id + '.')
     print('Program created by SamuiNe <https://github.com/SamuiNe>')
-    System.previous_playing_message = System.prefix_question + 'help for help'
+    System.previous_playing_message = System.prefix + 'help for help'
     if System.test_mode:
         await sophia.change_presence(game=discord.Game(name='\u26A0 TEST MODE \u26A0'))
     else:
@@ -109,47 +96,19 @@ async def on_message(message):
 
     if is_person and is_allowed:
         if message.content.startswith(System.prefix_qualifier):
-            if message.content.startswith(System.prefix_question):
-                await commands.question_process(bot_system, chat_tunnel, System, sophia, message, message_low,
-                    TunnelInfo)
 
-            elif message.content.startswith(System.prefix_information):
-                await commands.information_process(asyncio, discord, bot_system, chat_tunnel, System, sophia, message,
-                    message_low, TunnelInfo)
+            if message.content.startswith(System.prefix):
+                await commands.command_process(asyncio, discord, bot_system, chat_tunnel, System, sophia, message,
+                        message_low, TunnelInfo)
 
-            elif message.content.startswith(System.prefix_debug):
-                if message.author.id in System.ATSUI:
-                    if message_low.startswith(System.prefix_debug + 'eval'):
-                        message_content = message.content.split(' ', maxsplit=1)
+            elif message.author.id in System.ATSUI:
+                if message.content is '<>modulereload' or '><modulereload':
+                    importlib.reload(commands)
+                    importlib.reload(chat_tunnel)
+                    importlib.reload(bot_system)
+                    importlib.reload(room)
 
-                        if len(message_content) > 1:
-                            if message_content[1] not in System.forbidden_eval:
-                                try:
-                                    message_send = eval(message_content[1])
-                                except BaseException:
-                                    await sophia.send_message(message.channel,
-                                        System.eval_error_message[random.randrange(
-                                        System.eval_error_length)] + '\n' +
-                                        '```py\n' + traceback.format_exc() + '```')
-
-                                else:
-                                    await sophia.send_message(message.channel, message_send)
-                            else:
-                                await sophia.send_message(message.channel, 'nope')
-                        else:
-                            await sophia.send_message(message.channel, ':eyes:')
-
-                    elif message_low.startswith(System.prefix_debug + 'modulereload'):
-                        importlib.reload(commands)
-                        importlib.reload(chat_tunnel)
-                        importlib.reload(bot_system)
-                        importlib.reload(room)
-
-                        await sophia.send_message(message.channel, 'Dependant modules has successfully reloaded.')
-
-                    else:
-                        await commands.debug_process(sys, asyncio, discord, psutil, bot_system, room,
-                            System, sophia, message, message_low, RoomInfo)
+                    await sophia.send_message(message.channel, 'Dependant modules has successfully reloaded.')
 
         else:
             # await sophia.send_message(message.channel, 'message OK')
