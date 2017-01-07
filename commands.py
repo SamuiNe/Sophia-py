@@ -88,9 +88,9 @@ async def command_process(asyncio, discord, bot_system, chat_tunnel, system, sop
                         message_send = eval(message_content[1])
                     except BaseException:
                         await sophia.send_message(message.channel,
-                                                  system.eval_error_message[random.randrange(
-                                                      system.eval_error_length)] + '\n' +
-                                                  '```py\n' + traceback.format_exc() + '```')
+                                system.eval_error_message[random.randrange(
+                                  system.eval_error_length)] + '\n' +
+                                '```py\n' + traceback.format_exc() + '```')
 
                     else:
                         await sophia.send_message(message.channel, message_send)
