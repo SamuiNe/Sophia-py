@@ -16,8 +16,10 @@ async def tunnel_references(discord, message, tunnel_info, tunnel_password, tunn
     if tunnel_name is not None:
         tunnel_info.tunnel_receive.append([[True, False, tunnel_name, tunnel_password]])
 
+    enable_send_receive = 3
+
     tunnel_info.tunnel_receive[tunnel_id].append([discord.utils.get(message.server.channels, id=channel_id),
-            3, message.channel.id, False,message.author.id, False])
+            enable_send_receive, message.channel.id, False, message.author.id, False, False, False])
     append_point = len(tunnel_info.tunnel_receive[tunnel_id]) - 1
 
     tunnel_info.channel_relation.append([message.channel.id, append_point, tunnel_id])
@@ -516,13 +518,13 @@ async def chat_tunnel_process(sophia, message, tunnel_info):
                             if message.channel.id != current_tunnel[loop_count][2]:
                                 # await sophia.send_message(message.channel, 'Switched to False')
                                 tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
-                                tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = False
-                                tunnel_info.tunnel_receive[tunnel_id][loop_count][4] = message.author.id
+                                tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = message.author.id
+                                tunnel_info.tunnel_receive[tunnel_id][loop_count][4] = False
                                 tunnel_info.tunnel_receive[tunnel_id][loop_count][5] = False
 
-                            if current_tunnel[loop_count][3]:
-                                if message.author.id != current_tunnel[loop_count][4]:
-                                    tunnel_info.tunnel_receive[tunnel_id][loop_count][4] = message.author.id
+                            if current_tunnel[loop_count][4]:
+                                if message.author.id != current_tunnel[loop_count][3]:
+                                    tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = message.author.id
                                     tunnel_info.tunnel_receive[tunnel_id][loop_count][5] = False
 
                                 if current_tunnel[loop_count][5]:
@@ -541,11 +543,11 @@ async def chat_tunnel_process(sophia, message, tunnel_info):
                                     str(message.author) + '\n' +
                                     str(message.timestamp)[11:16] + ' >> ' + str(message.content))
                                 # await sophia.send_message(message.channel, 'Switched to True')
-                                tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = True
+                                tunnel_info.tunnel_receive[tunnel_id][loop_count][4] = True
                                 tunnel_info.tunnel_receive[tunnel_id][loop_count][5] = True
 
                         else:
                             tunnel_info.tunnel_receive[tunnel_id][loop_count][2] = message.channel.id
-                            tunnel_info.tunnel_receive[tunnel_id][loop_count][3] = False
+                            tunnel_info.tunnel_receive[tunnel_id][loop_count][4] = False
 
                     loop_count += 1

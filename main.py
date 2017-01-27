@@ -4,7 +4,9 @@
 # python built-in modules
 import importlib
 import logging
+import random
 import sys
+import traceback
 
 # other modules
 import asyncio
@@ -13,7 +15,6 @@ import discord
 # sophia modules
 import commands
 import bot_system
-import room
 import chat_tunnel
 
 logging.basicConfig(level=logging.INFO)
@@ -34,17 +35,12 @@ System = bot_system.SystemVariables(
         eval_error_message=('ya dun goofed', 'AAAAAAAAAAAAAaaaaaaaaaaa', 'GRAND DAD', 'b-baka!!!',
             'i-its not like I want to help you or anything!', 'git gud', 'did you re-read the code before entering it?',
             'too much php for today?', 'maybe you need some rest?', 'maybe this might help you?',
-            'some snek told me this', 'still better than recursive infinite loop', 'you\'ve messed up again?',
+            'owo whats this?', 'still better than recursive infinite loop', 'you\'ve messed up again?',
             'try not to rely on eval too much', 'don\'t worry, at least you\'re improving',
             'maybe you need to understand the code first before evaling?', 'zzz', ':eyes:', 'wew',
-            '418 I\'m a teapot', 'are you bored at the moment?', 'you\'ve tried™', 'sdjkfhakjlhfskajhfkjlhf',
-            'what are you doing?', 'I am an error message fairy', 'are you having fun?', 'wew lad',
-            'how many times are you going to do this?', 'p-please be gentle', 'you have found a rare item!',
-            'I\'ll slap you for this', 'no cookies for you today!', 'I\'ll revoke your programming certificate',
-            'again?'))
-RoomInfo = room.RoomInformations([], [['Blackjack'], [6]],
-        ('Waiting', 'In Progress', 'Deleted'),
-        [['Testing room', 'Blackjack', 'Testing', '0']])
+            '418 I\'m a teapot', 'you\'ve tried™', 'sdjkfhakjlhfskajhfkjlhf', 'I am an error message fairy',
+            'wew lad', 'p-please be gentle', 'you have found a rare item!', 'I\'ll slap you for this',
+            'no cookies for you today!', 'I\'ll revoke your programming certificate', 'I need healing!'))
 TunnelInfo = chat_tunnel.TunnelInformations([], [], [], [], [], [[[True, False, 'Global Chat', '']]])
 sophia = discord.Client()
 
@@ -101,17 +97,34 @@ async def on_message(message):
                 await commands.command_process(asyncio, discord, bot_system, chat_tunnel, System, sophia, message,
                         message_low, TunnelInfo)
 
-            elif message.author.id in System.ATSUI:
-                if message.content is '<>modulereload' or '><modulereload':
+        else:
+            if message.author.id in System.ATSUI:
+                if message_low.startswith('<>eval' or '><eval'):
+                    message_content = message.content.split(' ', maxsplit=1)
+
+                    if len(message_content) > 1:
+                        if message_content[1] not in System.forbidden_eval:
+                            try:
+                                message_send = eval(message_content[1])
+                            except BaseException:
+                                await sophia.send_message(message.channel,
+                                    System.eval_error_message[random.randrange(System.eval_error_length)] + '\n' +
+                                    '```py\n' + traceback.format_exc() + '```')
+
+                            else:
+                                await sophia.send_message(message.channel, message_send)
+                        else:
+                            await sophia.send_message(message.channel, 'nope')
+                    else:
+                        await sophia.send_message(message.channel, ':eyes:')
+
+                elif message.content == '<>modulereload' or message.content == '><modulereload':
                     importlib.reload(commands)
                     importlib.reload(chat_tunnel)
                     importlib.reload(bot_system)
-                    importlib.reload(room)
 
                     await sophia.send_message(message.channel, 'Dependant modules has successfully reloaded.')
 
-        else:
-            # await sophia.send_message(message.channel, 'message OK')
             if message.server.id in System.trigger_exclude:
                 await commands.trigger_commands(asyncio, sophia, message, message_low)
 

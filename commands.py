@@ -1,15 +1,13 @@
 # coding=utf-8
 
 # Other required python built-in modules
-import random
-import traceback
 import sys
 
 # Other modules
 import psutil
 
 
-__version__ = '0.2.20'
+__version__ = '0.3.dev_0'
 
 
 # TODO: Add poll command
@@ -79,27 +77,7 @@ async def command_process(asyncio, discord, bot_system, chat_tunnel, system, sop
 # Old command debug prefix
 
     if message.author.id in system.ATSUI:
-        if message_low.startswith(system.prefix + 'eval'):
-            message_content = message.content.split(' ', maxsplit=1)
-
-            if len(message_content) > 1:
-                if message_content[1] not in system.forbidden_eval:
-                    try:
-                        message_send = eval(message_content[1])
-                    except BaseException:
-                        await sophia.send_message(message.channel,
-                                system.eval_error_message[random.randrange(
-                                system.eval_error_length)] + '\n' +
-                                '```py\n' + traceback.format_exc() + '```')
-
-                    else:
-                        await sophia.send_message(message.channel, message_send)
-                else:
-                    await sophia.send_message(message.channel, 'nope')
-            else:
-                await sophia.send_message(message.channel, ':eyes:')
-
-        elif message_low == system.prefix + 'secret':
+        if message_low == system.prefix + 'secret':
             await sophia.send_message(message.channel, 'Nothing to see here!')
 
         elif message_low.startswith(system.prefix + 'prefixchange'):
